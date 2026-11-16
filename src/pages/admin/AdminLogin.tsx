@@ -164,16 +164,7 @@ export const AdminLogin: React.FC = () => {
                 </div>
               )}
 
-              <div className="p-3 bg-[#F4EBD0] border-2 border-[#303030] text-xs text-[#182747]">
-                <div className="font-mono-data font-bold text-[#4169E1] mb-1">
-                  DEMO ADMINISTRATOR CREDENTIALS
-                </div>
-                <p className="font-mono-data">Email: admin@skillora.in</p>
-                <p className="font-mono-data">Password: Admin123</p>
-                <p className="text-[11px] text-[#303030] mt-1">
-                  Frontend demonstration login only.
-                </p>
-              </div>
+
 
               <RetroButton type="submit" variant="primary" size="lg" className="w-full">
                 <KeyRound className="w-4 h-4" />
