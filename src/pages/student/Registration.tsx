@@ -11,7 +11,7 @@ import { NotificationDialog } from '../../components/NotificationDialog';
 import { RetroFooter } from '../../components/RetroFooter';
 
 export const Registration: React.FC = () => {
-  const { state, registerStudent } = useApp();
+  const { registerStudent, authenticateStudent } = useApp();
   const { loginAsStudent } = useAuth();
   const navigate = useNavigate();
 
@@ -30,6 +30,7 @@ export const Registration: React.FC = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
   const [registeredStudentId, setRegisteredStudentId] = useState<string | null>(null);
   const [errorDialogMsg, setErrorDialogMsg] = useState<string | null>(null);
@@ -38,6 +39,7 @@ export const Registration: React.FC = () => {
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const validate = (): boolean => {
     const next: Record<string, string> = {};
@@ -79,29 +81,34 @@ export const Registration: React.FC = () => {
     return Object.keys(next).length === 0;
   };
 
-  const handleRegisterSubmit = (e: React.FormEvent) => {
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
+    if (!validate() || isSubmitting) return;
 
-    const result = registerStudent({
-      fullName,
-      email,
-      mobile: mobile.replace(/\D/g, ''),
-      college,
-      course,
-      semester,
-      domain: domain as InternshipDomain,
-      password,
-    });
+    setIsSubmitting(true);
+    try {
+      const result = await registerStudent({
+        fullName,
+        email,
+        mobile: mobile.replace(/\D/g, ''),
+        college,
+        course,
+        semester,
+        domain: domain as InternshipDomain,
+        password,
+      });
 
-    if (result.ok === false) {
-      setErrorDialogMsg(result.error);
-      return;
+      if (result.ok === false) {
+        setErrorDialogMsg(result.error);
+        return;
+      }
+
+      setRegisteredStudentId(result.student.id);
+      loginAsStudent(result.student.id);
+      setSuccessDialogOpen(true);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setRegisteredStudentId(result.student.id);
-    loginAsStudent(result.student.id);
-    setSuccessDialogOpen(true);
   };
 
   const handleContinueToOfferLetter = () => {
@@ -111,19 +118,22 @@ export const Registration: React.FC = () => {
     }
   };
 
-  const handleReturningLogin = (e: React.FormEvent) => {
+  const handleReturningLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoggingIn) return;
     setLoginError('');
-    const normalized = loginEmail.trim().toLowerCase();
-    const matched = state.students.find(
-      (s) => s.email.toLowerCase() === normalized && s.password === loginPassword
-    );
-    if (!matched) {
-      setLoginError('Invalid student email or password. Please check your credentials.');
-      return;
+    setIsLoggingIn(true);
+    try {
+      const matched = await authenticateStudent(loginEmail, loginPassword);
+      if (!matched) {
+        setLoginError('Invalid student email or password. Please check your credentials.');
+        return;
+      }
+      loginAsStudent(matched.id);
+      navigate('/student/dashboard');
+    } finally {
+      setIsLoggingIn(false);
     }
-    loginAsStudent(matched.id);
-    navigate('/student/dashboard');
   };
 
   const inputClass =
@@ -140,13 +150,46 @@ export const Registration: React.FC = () => {
 
           <nav
             aria-label="Portal Access Navigation"
-            className="flex flex-wrap items-center gap-3 sm:gap-4"
+            className="flex flex-wrap items-center gap-2 sm:gap-3"
           >
-            {/* Student Portal Group */}
-            <div className="flex flex-wrap items-center gap-2 pr-0 sm:pr-4 sm:border-r-2 sm:border-[#303030]/30">
-              <span className="hidden md:inline font-pixel text-[8px] text-[#4169E1] mr-1">
-                STUDENT PORTAL:
-              </span>
+            <span className="hidden md:inline font-pixel text-[8px] text-[#4169E1] mr-1">
+              STUDENT PORTAL:
+            </span>
+            <RetroButton
+              type="button"
+              size="sm"
+              variant={mode === 'login' ? 'primary' : 'neutral'}
+              onClick={() => setMode('login')}
+            >
+              <KeyRound className="w-3.5 h-3.5" />
+              <span>Student Login</span>
+            </RetroButton>
+            <RetroButton
+              type="button"
+              size="sm"
+              variant={mode === 'register' ? 'primary' : 'neutral'}
+              onClick={() => setMode('register')}
+            >
+              <UserPlus className="w-3.5 h-3.5" />
+              <span>Register for Internship</span>
+            </RetroButton>
+          </nav>
+        </div>
+      </header>
+
+      <main className="flex-1 px-4 py-6 sm:py-8">
+        <div className="max-w-4xl mx-auto space-y-5">
+          {/* Portal Selection Strip */}
+          <div className="bg-[#FFF8E7] border-2 border-[#303030] p-4 retro-shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div className="font-pixel text-[9px] text-[#4169E1] uppercase">
+                STUDENT PORTAL
+              </div>
+              <p className="text-xs text-[#303030] mt-1">
+                Enroll in an internship domain or sign in to access your tasks &amp; offer letter.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
               <RetroButton
                 type="button"
                 size="sm"
@@ -159,77 +202,12 @@ export const Registration: React.FC = () => {
               <RetroButton
                 type="button"
                 size="sm"
-                variant={mode === 'register' ? 'primary' : 'neutral'}
+                variant={mode === 'register' ? 'success' : 'neutral'}
                 onClick={() => setMode('register')}
               >
                 <UserPlus className="w-3.5 h-3.5" />
                 <span>Register for Internship</span>
               </RetroButton>
-            </div>
-
-            {/* Separate Admin Portal Access Button */}
-            <Link
-              to="/admin/login"
-              className="inline-flex items-center gap-2 px-3.5 py-2 bg-[#182747] text-[#F4C542] border-2 border-[#303030] font-mono-data font-bold text-xs uppercase tracking-wider retro-shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:bg-[#F4C542] hover:text-[#182747] active:translate-y-0"
-            >
-              <Shield className="w-4 h-4 shrink-0" />
-              <span>ADMIN LOGIN</span>
-            </Link>
-          </nav>
-        </div>
-      </header>
-
-      <main className="flex-1 px-4 py-6 sm:py-8">
-        <div className="max-w-4xl mx-auto space-y-5">
-          {/* Separated Portal Selection Strip */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="md:col-span-2 bg-[#FFF8E7] border-2 border-[#303030] p-4 retro-shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <div className="font-pixel text-[9px] text-[#4169E1] uppercase">
-                  STUDENT PORTAL
-                </div>
-                <p className="text-xs text-[#303030] mt-1">
-                  Enroll in an internship domain or sign in to access your tasks &amp; offer letter.
-                </p>
-              </div>
-              <div className="flex flex-wrap items-center gap-2 shrink-0">
-                <RetroButton
-                  type="button"
-                  size="sm"
-                  variant={mode === 'login' ? 'primary' : 'neutral'}
-                  onClick={() => setMode('login')}
-                >
-                  <KeyRound className="w-3.5 h-3.5" />
-                  <span>Student Login</span>
-                </RetroButton>
-                <RetroButton
-                  type="button"
-                  size="sm"
-                  variant={mode === 'register' ? 'success' : 'neutral'}
-                  onClick={() => setMode('register')}
-                >
-                  <UserPlus className="w-3.5 h-3.5" />
-                  <span>Register for Internship</span>
-                </RetroButton>
-              </div>
-            </div>
-
-            <div className="bg-[#182747] text-[#FFF8E7] border-2 border-[#303030] p-4 retro-shadow-sm flex items-center justify-between gap-3">
-              <div>
-                <div className="font-pixel text-[9px] text-[#F4C542] uppercase">
-                  ADMIN PORTAL
-                </div>
-                <p className="text-xs text-[#F4EBD0] mt-1">
-                  Authorized control panel
-                </p>
-              </div>
-              <Link
-                to="/admin/login"
-                className="inline-flex items-center gap-2 px-3 py-2 bg-[#F4C542] text-[#182747] border-2 border-[#303030] font-mono-data font-bold text-xs uppercase tracking-wider shrink-0 transition-all duration-150 hover:-translate-y-0.5 hover:bg-[#FFF8E7] active:translate-y-0"
-              >
-                <Shield className="w-4 h-4 shrink-0" />
-                <span>ADMIN LOGIN</span>
-              </Link>
             </div>
           </div>
 
@@ -488,9 +466,9 @@ export const Registration: React.FC = () => {
                     Already registered? Sign in to your Student Terminal
                   </button>
 
-                  <RetroButton type="submit" variant="success" size="lg">
+                  <RetroButton type="submit" variant="success" size="lg" disabled={isSubmitting}>
                     <CheckSquare className="w-4 h-4" />
-                    <span>[ REGISTER NOW ]</span>
+                    <span>{isSubmitting ? '[ SAVING... ]' : '[ REGISTER NOW ]'}</span>
                   </RetroButton>
                 </div>
               </form>
@@ -551,9 +529,15 @@ export const Registration: React.FC = () => {
                     </div>
                   )}
 
-                  <RetroButton type="submit" variant="primary" size="lg" className="w-full">
+                  <RetroButton
+                    type="submit"
+                    variant="primary"
+                    size="lg"
+                    className="w-full"
+                    disabled={isLoggingIn}
+                  >
                     <KeyRound className="w-4 h-4" />
-                    <span>SIGN IN TO DASHBOARD</span>
+                    <span>{isLoggingIn ? 'VERIFYING...' : 'SIGN IN TO DASHBOARD'}</span>
                   </RetroButton>
                 </form>
 

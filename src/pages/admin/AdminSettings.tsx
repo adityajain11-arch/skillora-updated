@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import {
+  CloudUpload,
   Database,
   HardDrive,
+  RefreshCw,
   RotateCcw,
   ShieldCheck,
   Sliders,
@@ -13,12 +15,14 @@ import {
   loadRememberedAdminEmail,
   saveRememberedAdminEmail,
 } from '../../services/storageService';
+import { SUPABASE_PROJECT_ID, SUPABASE_URL } from '../../services/supabaseClient';
+import { checkSupabaseHealth, SupabaseHealthResult } from '../../services/supabaseSyncService';
 import { RetroWindow } from '../../components/RetroWindow';
 import { RetroButton } from '../../components/RetroButton';
 import { NotificationDialog } from '../../components/NotificationDialog';
 
 export const AdminSettings: React.FC = () => {
-  const { state, resetDemoData } = useApp();
+  const { state, resetDemoData, refreshFromSupabase, syncDemoDataToSupabase } = useApp();
   const { session } = useAuth();
 
   const [rememberedEmail, setRememberedEmail] = useState<string>(() =>
@@ -26,6 +30,11 @@ export const AdminSettings: React.FC = () => {
   );
   const [confirmResetOpen, setConfirmResetOpen] = useState(false);
   const [resetDoneOpen, setResetDoneOpen] = useState(false);
+
+  const [supaStatus, setSupaStatus] = useState<SupabaseHealthResult | null>(null);
+  const [checkingSupa, setCheckingSupa] = useState(false);
+  const [syncMsg, setSyncMsg] = useState<string | null>(null);
+  const [syncingUp, setSyncingUp] = useState(false);
 
   const handleToggleRemembered = () => {
     if (rememberedEmail) {
@@ -41,6 +50,49 @@ export const AdminSettings: React.FC = () => {
     resetDemoData();
     setConfirmResetOpen(false);
     setResetDoneOpen(true);
+  };
+
+  const handleCheckSupabase = async () => {
+    setCheckingSupa(true);
+    setSyncMsg(null);
+    try {
+      const res = await checkSupabaseHealth();
+      setSupaStatus(res);
+    } finally {
+      setCheckingSupa(false);
+    }
+  };
+
+  const handleSyncToSupabase = async () => {
+    setSyncingUp(true);
+    setSyncMsg(null);
+    try {
+      const res = await syncDemoDataToSupabase();
+      if (res.ok) {
+        setSyncMsg('All current portal records have been synced to your Supabase tables.');
+        const health = await checkSupabaseHealth();
+        setSupaStatus(health);
+      } else {
+        setSyncMsg(`Sync note: ${res.error || 'Ensure schema.sql has been executed in Supabase.'}`);
+      }
+    } finally {
+      setSyncingUp(false);
+    }
+  };
+
+  const handlePullFromSupabase = async () => {
+    setCheckingSupa(true);
+    setSyncMsg(null);
+    try {
+      const ok = await refreshFromSupabase();
+      setSyncMsg(
+        ok
+          ? 'Fetched latest student & internship records from Supabase.'
+          : 'Could not read tables yet. Ensure schema.sql has been executed in Supabase SQL Editor.'
+      );
+    } finally {
+      setCheckingSupa(false);
+    }
   };
 
   return (
@@ -108,12 +160,10 @@ export const AdminSettings: React.FC = () => {
             <div className="flex items-start gap-3 p-3.5 bg-[#FFF8E7] border-2 border-[#303030]">
               <HardDrive className="w-5 h-5 text-[#4E8B62] shrink-0 mt-0.5" />
               <div className="text-xs text-[#182747]">
-                <p className="font-bold uppercase text-[#4E8B62]">
-                  Browser Storage Inventory
-                </p>
+                <p className="font-bold uppercase text-[#4E8B62]">Portal Records Inventory</p>
                 <p className="mt-1 text-[#303030]">
-                  All portal updates sync immediately across Student and Admin portals via React
-                  state and browser localStorage.
+                  Records synchronize with your Supabase backend tables alongside local browser
+                  caching.
                 </p>
               </div>
             </div>
@@ -163,8 +213,7 @@ export const AdminSettings: React.FC = () => {
                 <div>
                   <h3 className="text-sm font-bold text-[#8a2323]">Restore Demo Dataset</h3>
                   <p className="text-xs text-[#303030]">
-                    Reset all students, tasks, offer letters, submissions, certificates, LORs, and
-                    logs back to the initial demonstration snapshot.
+                    Reset local portal records back to the initial demonstration snapshot.
                   </p>
                 </div>
               </div>
@@ -183,10 +232,91 @@ export const AdminSettings: React.FC = () => {
         </RetroWindow>
       </div>
 
+      {/* Supabase Backend Sync Settings */}
+      <RetroWindow title="SUPABASE_BACKEND_SYNC.EXE" headerColor="navy">
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-4 bg-white border-2 border-[#303030] space-y-1.5 text-xs">
+              <div className="font-bold uppercase text-[#4169E1]">Connected Supabase Project</div>
+              <div className="font-mono-data text-sm font-bold text-[#182747]">
+                Project ID: {SUPABASE_PROJECT_ID}
+              </div>
+              <div className="font-mono-data text-[#303030] break-all">{SUPABASE_URL}</div>
+              <p className="text-[#303030] pt-1">
+                New student registrations, offer letters, internship edits, tasks, submissions,
+                certificates, and LORs automatically sync to your Supabase tables.
+              </p>
+            </div>
+
+            <div className="p-4 bg-[#F4EBD0] border-2 border-[#303030] flex flex-col justify-between gap-3">
+              <div className="text-xs text-[#182747]">
+                <p className="font-bold uppercase text-[#182747]">Database Schema Verification</p>
+                <p className="mt-1 text-[#303030]">
+                  Ensure the SQL tables in <code className="font-mono-data">supabase/schema.sql</code>{' '}
+                  are created in your Supabase SQL Editor, then verify or sync below.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <RetroButton
+                  type="button"
+                  size="sm"
+                  variant="primary"
+                  onClick={handleCheckSupabase}
+                  disabled={checkingSupa}
+                >
+                  <Database className="w-3.5 h-3.5" />
+                  <span>{checkingSupa ? 'Checking...' : 'Check Tables'}</span>
+                </RetroButton>
+                <RetroButton
+                  type="button"
+                  size="sm"
+                  variant="success"
+                  onClick={handleSyncToSupabase}
+                  disabled={syncingUp}
+                >
+                  <CloudUpload className="w-3.5 h-3.5" />
+                  <span>{syncingUp ? 'Syncing...' : 'Sync Local Data to Supabase'}</span>
+                </RetroButton>
+                <RetroButton
+                  type="button"
+                  size="sm"
+                  variant="neutral"
+                  onClick={handlePullFromSupabase}
+                  disabled={checkingSupa}
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>Pull from Supabase</span>
+                </RetroButton>
+              </div>
+            </div>
+          </div>
+
+          {supaStatus && (
+            <div
+              className={`p-3 border-2 text-xs font-semibold ${
+                supaStatus.tablesReady
+                  ? 'bg-[#4E8B62]/15 border-[#4E8B62] text-[#1e4d2b]'
+                  : 'bg-[#C94C4C]/15 border-[#C94C4C] text-[#8a2323]'
+              }`}
+            >
+              {supaStatus.tablesReady
+                ? `Supabase tables verified! Found ${supaStatus.studentCount ?? 0} student record(s) in public.students.`
+                : `Tables not ready yet: ${supaStatus.errorMessage}. Run supabase/schema.sql in your Supabase SQL Editor.`}
+            </div>
+          )}
+
+          {syncMsg && (
+            <div className="p-3 bg-[#FFF8E7] border-2 border-[#303030] text-xs font-semibold text-[#182747]">
+              {syncMsg}
+            </div>
+          )}
+        </div>
+      </RetroWindow>
+
       <NotificationDialog
         open={confirmResetOpen}
         title="CONFIRM_DEMO_RESET.EXE"
-        message="Are you sure you want to reset all portal records back to the initial Skillora demo dataset?"
+        message="Are you sure you want to reset all local portal records back to the initial Skillora demo dataset?"
         type="info"
         confirmLabel="Reset Demo Data"
         cancelLabel="Cancel"
@@ -197,7 +327,7 @@ export const AdminSettings: React.FC = () => {
       <NotificationDialog
         open={resetDoneOpen}
         title="DEMO_RESET_COMPLETE.EXE"
-        message="All Skillora portal data has been restored to the initial demonstration snapshot."
+        message="Local Skillora portal data has been restored to the initial demonstration snapshot."
         type="success"
         confirmLabel="OK"
         onConfirm={() => setResetDoneOpen(false)}

@@ -28,6 +28,14 @@ import {
   generateOfferLetterNumber,
   generateStudentId,
 } from '../utils/idGenerators';
+import { initialSeedState } from '../data/seedData';
+import {
+  fetchExistingSupabaseStudentIdsAndEmails,
+  fetchStudentByCredentialsFromSupabase,
+  insertStudentRegistrationToSupabase,
+  loadPortalStateFromSupabase,
+  seedFullStateToSupabase,
+} from '../services/supabaseSyncService';
 
 export interface RegisterStudentInput {
   fullName: string;
@@ -49,11 +57,16 @@ export interface InternshipEditPayload {
   internshipStatus?: InternshipStatus;
 }
 
+export type RegisterStudentResult =
+  | { ok: true; student: Student; supabaseSynced: boolean; syncError?: string }
+  | { ok: false; error: string };
+
 interface AppContextValue {
   state: PortalState;
-  registerStudent: (
-    input: RegisterStudentInput
-  ) => { ok: true; student: Student } | { ok: false; error: string };
+  registerStudent: (input: RegisterStudentInput) => Promise<RegisterStudentResult>;
+  authenticateStudent: (email: string, password: string) => Promise<Student | null>;
+  refreshFromSupabase: () => Promise<boolean>;
+  syncDemoDataToSupabase: () => Promise<{ ok: boolean; error?: string }>;
   updateStudentProfile: (
     studentId: string,
     updates: Partial<Pick<Student, 'fullName' | 'mobile' | 'college' | 'course' | 'semester'>>
@@ -158,21 +171,107 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   }, []);
 
+  const refreshFromSupabase = useCallback(async (): Promise<boolean> => {
+    try {
+      const remote = await loadPortalStateFromSupabase();
+      if (!remote) return false;
+
+      const hasRemoteStudents = (remote.students?.length ?? 0) > 0;
+      const hasRemoteTasks = (remote.tasks?.length ?? 0) > 0;
+
+      if (!hasRemoteStudents && !hasRemoteTasks) {
+        return true;
+      }
+
+      commit((prev) => ({
+        students: hasRemoteStudents ? remote.students! : prev.students,
+        offerLetters:
+          (remote.offerLetters?.length ?? 0) > 0
+            ? remote.offerLetters!
+            : hasRemoteStudents
+            ? []
+            : prev.offerLetters,
+        changeLogs:
+          (remote.changeLogs?.length ?? 0) > 0
+            ? remote.changeLogs!
+            : hasRemoteStudents
+            ? []
+            : prev.changeLogs,
+        notifications:
+          (remote.notifications?.length ?? 0) > 0
+            ? remote.notifications!
+            : hasRemoteStudents
+            ? []
+            : prev.notifications,
+        tasks: hasRemoteTasks
+          ? remote.tasks!
+          : prev.tasks.length > 0
+          ? prev.tasks
+          : initialSeedState.tasks,
+        taskSubmissions:
+          (remote.taskSubmissions?.length ?? 0) > 0
+            ? remote.taskSubmissions!
+            : hasRemoteStudents
+            ? []
+            : prev.taskSubmissions,
+        projectSubmissions:
+          (remote.projectSubmissions?.length ?? 0) > 0
+            ? remote.projectSubmissions!
+            : hasRemoteStudents
+            ? []
+            : prev.projectSubmissions,
+        certificates:
+          (remote.certificates?.length ?? 0) > 0
+            ? remote.certificates!
+            : hasRemoteStudents
+            ? []
+            : prev.certificates,
+        lors:
+          (remote.lors?.length ?? 0) > 0
+            ? remote.lors!
+            : hasRemoteStudents
+            ? []
+            : prev.lors,
+      }));
+      return true;
+    } catch {
+      return false;
+    }
+  }, [commit]);
+
+  useEffect(() => {
+    void refreshFromSupabase();
+  }, [refreshFromSupabase]);
+
   const registerStudent = useCallback(
-    (input: RegisterStudentInput): { ok: true; student: Student } | { ok: false; error: string } => {
+    async (input: RegisterStudentInput): Promise<RegisterStudentResult> => {
       const normalizedEmail = input.email.trim().toLowerCase();
-      const duplicate = state.students.some(
+
+      const remoteCheck = await fetchExistingSupabaseStudentIdsAndEmails().catch(() => ({
+        ok: false,
+        ids: [] as string[],
+        emails: [] as string[],
+      }));
+
+      const duplicateLocal = state.students.some(
         (s) => s.email.trim().toLowerCase() === normalizedEmail
       );
-      if (duplicate) {
+      const duplicateRemote = remoteCheck.ok && remoteCheck.emails.includes(normalizedEmail);
+
+      if (duplicateLocal || duplicateRemote) {
         return {
           ok: false,
           error: 'An account with this email address is already registered in Skillora.',
         };
       }
 
+      const idPool: Student[] = [
+        ...state.students,
+        ...remoteCheck.ids.map((rid) => ({ id: rid } as Student)),
+      ];
+
       const now = new Date();
-      const id = generateStudentId(state.students);
+      const id = generateStudentId(idPool);
       const offerNumber = generateOfferLetterNumber(id);
       const formattedOfferDate = now.toLocaleDateString('en-US', {
         month: 'long',
@@ -223,6 +322,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         category: 'offer-letter',
       };
 
+      const supaRes = await insertStudentRegistrationToSupabase(
+        newStudent,
+        initialOffer,
+        welcomeNotif
+      ).catch((err: unknown) => ({
+        ok: false,
+        duplicateEmail: false,
+        error: err instanceof Error ? err.message : 'Supabase request failed',
+      }));
+
+      if (!supaRes.ok && supaRes.duplicateEmail) {
+        return {
+          ok: false,
+          error:
+            supaRes.error ||
+            'An account with this email address is already registered in Skillora.',
+        };
+      }
+
       commit((prev) => ({
         ...prev,
         students: [newStudent, ...prev.students],
@@ -230,10 +348,56 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         notifications: [welcomeNotif, ...prev.notifications],
       }));
 
-      return { ok: true, student: newStudent };
+      return {
+        ok: true,
+        student: newStudent,
+        supabaseSynced: supaRes.ok,
+        syncError: supaRes.ok ? undefined : supaRes.error,
+      };
     },
     [state.students, commit]
   );
+
+  const authenticateStudent = useCallback(
+    async (email: string, password: string): Promise<Student | null> => {
+      const normalized = email.trim().toLowerCase();
+      const localMatch = state.students.find(
+        (s) => s.email.toLowerCase() === normalized && s.password === password
+      );
+      if (localMatch) return localMatch;
+
+      try {
+        const remoteStudent = await fetchStudentByCredentialsFromSupabase(normalized, password);
+        if (remoteStudent) {
+          commit((prev) => ({
+            ...prev,
+            students: prev.students.some((s) => s.id === remoteStudent.id)
+              ? prev.students.map((s) => (s.id === remoteStudent.id ? remoteStudent : s))
+              : [remoteStudent, ...prev.students],
+          }));
+          return remoteStudent;
+        }
+      } catch {
+        // fallback to null
+      }
+      return null;
+    },
+    [state.students, commit]
+  );
+
+  const syncDemoDataToSupabase = useCallback(async (): Promise<{
+    ok: boolean;
+    error?: string;
+  }> => {
+    try {
+      return await seedFullStateToSupabase(state);
+    } catch (err) {
+      return {
+        ok: false,
+        error: err instanceof Error ? err.message : 'Failed to sync dataset to Supabase.',
+      };
+    }
+  }, [state]);
 
   const updateStudentProfile = useCallback(
     (
@@ -345,7 +509,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         if (newLogs.length === 0) return prev;
 
-        // NOTE: Do NOT overwrite already issued OfferLetterRecord when domain changes!
         return {
           ...prev,
           students: prev.students.map((s) =>
@@ -1011,6 +1174,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       value={{
         state,
         registerStudent,
+        authenticateStudent,
+        refreshFromSupabase,
+        syncDemoDataToSupabase,
         updateStudentProfile,
         updateStudentStatus,
         updateStudentInternshipDetails,
