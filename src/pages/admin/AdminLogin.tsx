@@ -31,13 +31,13 @@ export const AdminLogin: React.FC = () => {
     setErrorMessage('');
 
     const normalizedEmail = email.trim().toLowerCase();
-    if (normalizedEmail === 'admin@skillora.in' && password === 'Admin123') {
+    if (normalizedEmail === 'admin22@skillora.com' && password === 'Aditya@222006') {
       if (rememberMe) {
-        saveRememberedAdminEmail('admin@skillora.in');
+        saveRememberedAdminEmail('admin22@skillora.com');
       } else {
         saveRememberedAdminEmail(null);
       }
-      loginAsAdmin('admin@skillora.in');
+      loginAsAdmin('admin22@skillora.com');
       navigate('/admin/dashboard', { replace: true });
     } else {
       setErrorMessage(
@@ -96,7 +96,7 @@ export const AdminLogin: React.FC = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@skillora.in"
+                  placeholder="admin22@skillora.com"
                   className="w-full px-3 py-2.5 bg-white border-2 border-[#303030] text-sm text-[#182747] focus:outline-none focus:border-[#4169E1] retro-bevel-in"
                 />
               </div>
