@@ -1,0 +1,1260 @@
+# PROJECT NAME: SKILLORA – RETRO INTERNSHIP MANAGEMENT PORTAL
+
+## 1. PROJECT OVERVIEW
+
+Act as a senior frontend developer, software architect and professional UI/UX designer.
+
+Build a complete, responsive and fully interactive Internship Management Portal for my company, **SKILLORA**.
+
+The website will manage the complete internship journey, starting from student registration and ending with project completion, certificate issuance and Letter of Recommendation (LOR).
+
+The website must contain two completely separate interfaces:
+
+1. STUDENT PORTAL
+2. ADMIN PORTAL
+
+The entire project must be FRONTEND ONLY.
+
+Do not develop a backend, database, API, Supabase, Firebase or server-side authentication.
+
+Use React state and localStorage to simulate the complete application functionality.
+
+IMPORTANT: Do not create only a landing page or static UI prototype. Build all the pages, navigation, forms, tables, document previews and interactive functionality described below.
+
+---
+
+# 2. ORIGINAL COMPANY LOGO AND BRANDING
+
+I am providing the original Skillora company logo as an uploaded reference image.
+
+This logo is the official identity of my company.
+
+### Logo Requirements
+
+- Use the exact uploaded Skillora logo.
+- Do not redesign or recreate the logo.
+- Do not change the original colours.
+- Do not modify the typography or symbols.
+- Do not stretch or distort the logo.
+- Maintain the original aspect ratio.
+- Use transparent backgrounds wherever available.
+- Do not replace the logo with a generic graduation cap, computer icon or another symbol.
+- Do not convert the original logo into pixel art.
+
+### Logo Placement
+
+Use the original company logo consistently in:
+
+1. Student registration page.
+2. Student portal header.
+3. Student dashboard sidebar.
+4. Admin login page.
+5. Admin dashboard sidebar.
+6. Admin control room header.
+7. Offer letter header.
+8. Certificate design.
+9. Letter of Recommendation.
+10. Website footer.
+11. Loading screen.
+12. Browser favicon, using a suitable square version if available.
+
+The logo should be properly sized and clearly visible.
+
+The website interface can be retro-styled, but the original company logo must remain unchanged.
+
+---
+
+# 3. WEBSITE THEME – OLD-SCHOOL RETRO COMPUTER / GAMING
+
+This is one of the most important requirements.
+
+I do not want a typical modern SaaS dashboard, corporate website or generic blue-and-white design.
+
+I want the entire website to have an OLD-SCHOOL COMPUTER AND RETRO GAMING THEME.
+
+### Visual Inspiration
+
+Take inspiration from:
+
+- Windows 95.
+- Windows 98.
+- Classic DOS interfaces.
+- Vintage desktop applications.
+- 8-bit and 16-bit arcade games.
+- Old-school RPG quest menus.
+- Retro computer operating systems.
+
+The website should feel like operating a nostalgic computer application.
+
+### Colour Palette
+
+Use these colours consistently:
+
+- Vintage cream: #F4EBD0
+- Dark navy: #182747
+- Retro blue: #4169E1
+- Pixel yellow: #F4C542
+- Vintage green: #4E8B62
+- Retro red: #C94C4C
+- Light beige: #FFF8E7
+- Dark border: #303030
+
+### Typography
+
+Use:
+
+- Press Start 2P for small pixel-style headings.
+- VT323 for terminal-inspired text.
+- A readable sans-serif font for paragraphs, tables and forms.
+
+Do not use pixel fonts for long paragraphs because readability is important.
+
+### UI Components
+
+Use:
+
+- Classic rectangular buttons.
+- Pixel-inspired borders.
+- Vintage window title bars.
+- Desktop application-style cards.
+- Dotted separators.
+- Retro progress bars.
+- Pixel icons.
+- Classic notification dialogs.
+- Vintage computer panels.
+- Small hover animations.
+- Old-school dropdowns.
+- Retro-style tabs.
+
+Avoid:
+
+- Glassmorphism.
+- Excessive gradients.
+- Modern SaaS styling.
+- Unnecessary animations.
+- Overcrowded layouts.
+- Excessive neon colours.
+
+Maintain one consistent visual identity throughout the website.
+
+---
+
+# 4. COMPLETE WEBSITE WORKFLOW
+
+The complete workflow should be:
+
+STUDENT REGISTRATION
+↓
+INTERNSHIP DOMAIN SELECTION
+↓
+AUTOMATIC OFFER LETTER GENERATION
+↓
+STUDENT DASHBOARD
+↓
+INTERNSHIP TASKS
+↓
+PROJECT COMPLETION
+↓
+PROJECT SUBMISSION
+↓
+ADMIN REVIEW AND APPROVAL
+↓
+CERTIFICATE AND LOR ISSUANCE
+↓
+STUDENT DOWNLOADS DOCUMENTS
+
+Every step must be connected through functional frontend logic.
+
+---
+
+# 5. STUDENT PORTAL
+
+Create a separate student-facing interface.
+
+Students must never see admin navigation, admin controls or admin management information.
+
+## PAGE 1: STUDENT REGISTRATION
+
+This must be the first page displayed to a new student.
+
+### Design
+
+Create a vintage computer application window.
+
+Window title:
+
+SKILLORA_INTERNSHIP_REGISTRATION.EXE
+
+Place the original Skillora company logo at the top.
+
+Display a short introduction:
+
+"Welcome to Skillora! Start your professional journey by registering for your preferred internship domain."
+
+### Registration Form Fields
+
+1. Full Name
+2. Email Address
+3. Mobile Number
+4. College/University Name
+5. Current Course
+6. Year/Semester
+7. Internship Domain
+8. Password
+9. Confirm Password
+10. Terms and Conditions checkbox
+
+### Internship Domain Dropdown
+
+Include these domains:
+
+- Web Development
+- Python Development
+- Data Science
+- Artificial Intelligence & Machine Learning
+- UI/UX Design
+- Digital Marketing
+- Finance
+- Java Development
+- App Development
+- Graphic Design
+
+### Registration Functionality
+
+- All required fields must be validated.
+- Validate email format.
+- Validate password confirmation.
+- Mobile number must be validated.
+- Prevent duplicate email registrations in the demo.
+- Generate a unique Student ID automatically.
+- Generate registration date automatically.
+- Save student details in localStorage.
+- Generate an offer letter automatically after successful registration.
+- Redirect the student to the offer letter preview page.
+
+Use a retro-style button:
+
+[ REGISTER NOW ]
+
+After successful registration, display a classic retro success dialog:
+
+"REGISTRATION SUCCESSFUL! YOUR INTERNSHIP JOURNEY HAS STARTED."
+
+Add a button:
+
+[ CONTINUE TO OFFER LETTER ]
+
+---
+
+## PAGE 2: AUTOMATIC OFFER LETTER GENERATION
+
+This is a critical feature.
+
+I am providing my original Skillora offer letter as an uploaded reference.
+
+Use the uploaded document as the original offer-letter template.
+
+### IMPORTANT TEMPLATE INSTRUCTIONS
+
+Do not rewrite, shorten, paraphrase or unnecessarily redesign the original offer letter.
+
+Preserve:
+
+- Original paragraphs.
+- Original wording.
+- Company details.
+- Terms and conditions.
+- Signature information.
+- Document structure.
+- Formatting.
+- Existing branding.
+
+Only dynamically replace these three fields:
+
+1. Student Name.
+2. Internship Domain.
+3. Offer Letter Date.
+
+Do not modify any other information.
+
+### Example
+
+Student Name: Rahul Sharma
+
+Internship Domain: Web Development
+
+Offer Letter Date: Automatically generated current date.
+
+The generated document should use the original Skillora offer letter with these three updated fields.
+
+### Offer Letter Features
+
+Create a formal document preview with:
+
+- Original Skillora logo.
+- Offer letter title.
+- Student name.
+- Internship domain.
+- Current date.
+- Original company content.
+
+Buttons:
+
+- VIEW OFFER LETTER
+- DOWNLOAD PDF
+- PRINT OFFER LETTER
+- CONTINUE TO DASHBOARD
+
+### PDF Requirements
+
+- Generate a properly formatted PDF.
+- Maintain the original template layout as closely as possible.
+- Ensure all text is readable.
+- Avoid cutting paragraphs or signatures.
+- Give the downloaded document a meaningful filename.
+
+Example:
+
+Skillora_Offer_Letter_Rahul_Sharma.pdf
+
+The offer letter must look professional and formal, not like a game screen.
+
+The surrounding website can have a retro theme, but official documents must remain professional.
+
+---
+
+## PAGE 3: STUDENT DASHBOARD
+
+After the offer letter, redirect the student to their personal dashboard.
+
+### Dashboard Design
+
+Create a retro desktop application interface.
+
+Header:
+
+SKILLORA_STUDENT_TERMINAL.EXE
+
+Display:
+
+"Welcome, [Student Name]"
+
+Show:
+
+- Student ID.
+- Selected Internship Domain.
+- Registration Date.
+- Internship Status.
+
+### Student Sidebar
+
+Create the following navigation:
+
+1. Dashboard
+2. My Offer Letter
+3. Internship Tasks
+4. Project Submission
+5. My Certificate
+6. My Profile
+7. Logout
+
+Use pixel-inspired icons and retro application-style navigation.
+
+### Dashboard Summary Cards
+
+Display:
+
+- Registration Status.
+- Offer Letter Status.
+- Selected Domain.
+- Total Assigned Tasks.
+- Completed Tasks.
+- Pending Tasks.
+- Overall Progress.
+- Project Submission Status.
+- Certificate Status.
+
+Each card should have a vintage application-window appearance.
+
+### Dashboard Welcome Section
+
+Display:
+
+"YOUR INTERNSHIP JOURNEY STARTS HERE!"
+
+Add a short description:
+
+"Complete your assigned tasks, submit your projects and unlock your Skillora achievement."
+
+Use the original Skillora logo in the dashboard.
+
+---
+
+# 6. FIVE-STEP INTERNSHIP JOURNEY TRACKER
+
+Use my uploaded five-step tracker image as the structural reference.
+
+Recreate the same five-step layout with the old-school retro visual theme.
+
+Do not simply insert the uploaded image. Recreate it as a functional website component.
+
+### STEP 01 – REGISTER FREE ONLINE
+
+Description:
+
+Complete the Skillora registration form and create your student account.
+
+### STEP 02 – CHOOSE YOUR DOMAIN
+
+Description:
+
+Select your preferred internship domain from the available options.
+
+### STEP 03 – RECEIVE OFFICIAL OFFER LETTER
+
+Description:
+
+Receive your personalized Skillora internship offer letter automatically.
+
+### STEP 04 – COMPLETE PROJECT TASKS
+
+Description:
+
+Work on real-world project tasks, follow guidelines and submit your work.
+
+### STEP 05 – EARN VERIFIED CERTIFICATE & LOR
+
+Description:
+
+After successful project review and admin approval, receive your Certificate of Completion and Letter of Recommendation.
+
+### Visual Design
+
+- Five numbered pixel-style circles or square badges.
+- Connecting horizontal line on desktop.
+- Vintage blue for the active stage.
+- Green checkmark for completed stages.
+- Yellow highlight for the current stage.
+- Grey for upcoming stages.
+- Retro progress bar below the tracker.
+
+### Tracker Functionality
+
+The tracker must be dynamic.
+
+- Registration completed: Step 01.
+- Domain selected: Step 02.
+- Offer letter generated: Step 03.
+- Project tasks in progress: Step 04.
+- Project approved and certificate issued: Step 05.
+
+Show the current step and completion percentage.
+
+On mobile devices, convert the horizontal tracker into a vertical timeline.
+
+---
+
+# 7. INTERNSHIP TASK MANAGEMENT
+
+Create a separate page.
+
+Title:
+
+QUEST_BOARD.EXE
+
+This page should look like a retro RPG game mission board.
+
+### Display Task Information
+
+- Task Number.
+- Task Title.
+- Task Description.
+- Detailed Guidelines.
+- Internship Domain.
+- Submission Deadline.
+- Task Status.
+
+### Task Status
+
+- NOT STARTED
+- IN PROGRESS
+- SUBMITTED
+- APPROVED
+- NEEDS REVISION
+
+### Student Actions
+
+Students should be able to:
+
+- Open a task.
+- Read detailed instructions.
+- Start a task.
+- Submit project work.
+- Upload a file using a demo upload interface.
+- Add a project description.
+- View submission status.
+- View admin feedback.
+
+### Task Assignment
+
+Tasks should be relevant to the student's selected internship domain.
+
+For example:
+
+Web Development:
+- Create a responsive landing page.
+- Build a student registration form.
+- Develop a portfolio website.
+
+Python Development:
+- Create a basic management application.
+- Develop a file-handling program.
+- Build a data-processing project.
+
+Data Science:
+- Data cleaning.
+- Data visualization.
+- Basic exploratory data analysis.
+
+UI/UX Design:
+- Design a mobile application screen.
+- Create a website wireframe.
+- Develop a dashboard prototype.
+
+Use suitable sample tasks for the remaining domains.
+
+Admin must be able to create and assign tasks.
+
+---
+
+# 8. PROJECT SUBMISSION PAGE
+
+Title:
+
+PROJECT_UPLOAD.EXE
+
+Create a dedicated project submission page.
+
+### Form Fields
+
+- Student Name (Automatically populated).
+- Student ID (Automatically populated).
+- Internship Domain (Automatically populated).
+- Project Title.
+- Project Description.
+- Project File Upload.
+- GitHub/Project URL (Optional).
+- Submission Date (Automatically generated).
+
+Button:
+
+[ SUBMIT PROJECT ]
+
+### Functionality
+
+- Validate required fields.
+- Simulate project file upload.
+- Save project metadata in localStorage.
+- Update submission status to SUBMITTED.
+- Show a success notification.
+- Display submission details.
+- Show admin review status.
+
+Allow the student to view the feedback and revision status.
+
+IMPORTANT: This is a frontend demo. Store file metadata and simulate upload behaviour. Do not claim files are stored on a real server.
+
+---
+
+# 9. MY CERTIFICATE AND LOR PAGE
+
+Title:
+
+ACHIEVEMENT_UNLOCKED.EXE
+
+Create a separate certificate and LOR page.
+
+### Initially Display
+
+"YOUR ACHIEVEMENT IS WAITING!"
+
+"Complete your internship tasks and submit your project. Your certificate will become available after successful project review and admin approval."
+
+### Display Information
+
+- Student Name.
+- Student ID.
+- Internship Domain.
+- Project Approval Status.
+- Internship Completion Status.
+- Certificate Status.
+- LOR Status.
+
+### Certificate Functionality
+
+Once admin issues the certificate:
+
+- Display certificate preview.
+- Enable PDF download.
+- Display unique Certificate ID.
+- Display completion date.
+- Display Skillora logo.
+
+### LOR Functionality
+
+Once admin issues the LOR:
+
+- Display LOR preview.
+- Enable PDF download.
+- Display original Skillora branding.
+
+Students must never be able to approve or issue their own certificates.
+
+Both documents should have professional designs, not pixel-art designs.
+
+---
+
+# 10. STUDENT PROFILE PAGE
+
+Create a personal profile page.
+
+Display:
+
+- Student Name.
+- Email.
+- Mobile Number.
+- College.
+- Course.
+- Semester.
+- Internship Domain.
+- Student ID.
+- Registration Date.
+- Internship Status.
+
+Allow students to edit appropriate profile information in the demo.
+
+Student ID, registration date and official document information should not be casually editable.
+
+Save permitted profile changes in localStorage.
+
+---
+
+# 11. ADMIN PORTAL – SEPARATE INTERFACE
+
+Create a completely separate admin portal.
+
+The admin portal must have its own login, dashboard, sidebar and navigation.
+
+Students must not see the admin portal.
+
+Admins must not see the student portal navigation.
+
+Use separate route layouts.
+
+## ADMIN LOGIN PAGE
+
+Window title:
+
+SKILLORA_ADMIN_TERMINAL.EXE
+
+Use the original Skillora logo.
+
+### Demo Credentials
+
+Email: admin@skillora.in
+
+Password: Admin123
+
+After successful login, redirect to the Admin Dashboard.
+
+Show an error notification if incorrect credentials are entered.
+
+IMPORTANT: This is only frontend demonstration authentication, not secure production authentication.
+
+Do not display admin credentials in the student portal.
+
+---
+
+# 12. ADMIN DASHBOARD
+
+Title:
+
+ADMIN_CONTROL_ROOM.EXE
+
+Create a retro computer control-room interface.
+
+### Dashboard Summary Cards
+
+- Total Registered Students.
+- Total Applications.
+- Active Interns.
+- Offer Letters Generated.
+- Total Projects Submitted.
+- Projects Approved.
+- Projects Pending Review.
+- Certificates Issued.
+- LORs Issued.
+
+### Charts
+
+Create retro-inspired charts for:
+
+1. Students by Internship Domain.
+2. Registration Overview.
+3. Project Submission Status.
+4. Certificate Issuance Overview.
+
+Use Recharts or a similar frontend chart library.
+
+Use the retro colour palette.
+
+All statistics should update according to demo data.
+
+---
+
+# 13. ADMIN STUDENT MANAGEMENT
+
+Page Title:
+
+STUDENT_DATABASE.EXE
+
+Display all registered students in a professional retro spreadsheet-style table.
+
+### Table Columns
+
+- Student ID.
+- Student Name.
+- Email Address.
+- Mobile Number.
+- College Name.
+- Internship Domain.
+- Registration Date.
+- Offer Letter Status.
+- Internship Status.
+- Action.
+
+### Admin Functionalities
+
+- View Student Details.
+- Search by Student Name.
+- Search by Student ID.
+- Filter by Internship Domain.
+- Filter by Registration Date.
+- View Offer Letter.
+- Update Internship Status.
+
+Every new student registration must automatically appear in this table.
+
+Use pagination if there are many records.
+
+---
+
+# 14. ADMIN OFFER LETTER MANAGEMENT
+
+Page Title:
+
+OFFER_LETTER_MANAGER.EXE
+
+Create a separate page for offer-letter management.
+
+Admin can:
+
+- View all registered students.
+- Search students.
+- View student registration information.
+- Preview generated offer letters.
+- Download offer letters.
+- View selected internship domains.
+- Check offer-letter generation status.
+
+Offer letters must be generated automatically after registration.
+
+Use the original uploaded Skillora offer-letter template.
+
+Do not change its original content apart from the three specified dynamic fields.
+
+---
+
+# 15. ADMIN TASK MANAGEMENT
+
+Page Title:
+
+QUEST_MANAGER.EXE
+
+Admin must have complete control over internship tasks.
+
+### Admin Actions
+
+- Create New Task.
+- Select Internship Domain.
+- Add Task Title.
+- Add Task Description.
+- Add Guidelines.
+- Set Submission Deadline.
+- Edit Existing Tasks.
+- Delete Tasks.
+- Assign Tasks.
+- View Assigned Students.
+
+### Project Review
+
+Admin can:
+
+- View submitted project details.
+- View file metadata.
+- Open project URLs.
+- Read project descriptions.
+- Add feedback.
+- Approve project.
+- Request revision.
+
+When admin updates the submission status, the student dashboard must reflect the update.
+
+---
+
+# 16. ADMIN CERTIFICATE MANAGEMENT
+
+Page Title:
+
+CERTIFICATE_ISSUANCE.EXE
+
+Create a separate admin section for certificate and LOR management.
+
+This page must not be mixed with registration or task management.
+
+### Display Table
+
+- Student ID.
+- Student Name.
+- Internship Domain.
+- Project Status.
+- Internship Completion Status.
+- Certificate Status.
+- LOR Status.
+- Action.
+
+### Admin Functionalities
+
+1. View eligible students.
+2. View complete student details.
+3. Preview certificate.
+4. Generate certificate.
+5. Issue certificate.
+6. Generate LOR.
+7. Issue LOR.
+8. Download documents.
+
+### Eligibility Rules
+
+Only students whose required project work has been approved should be eligible for certificate issuance.
+
+### After Certificate Issuance
+
+- Update certificate status.
+- Save the certificate information.
+- Display the certificate in the student's dashboard.
+- Enable PDF download.
+- Update the admin certificate table.
+
+Use a formal, professional certificate design.
+
+Include:
+
+- Original Skillora logo.
+- Student Name.
+- Internship Domain.
+- Completion Date.
+- Unique Certificate ID.
+- Signature area.
+
+Use the same branding in the LOR.
+
+---
+
+# 17. ADMIN STUDENT PROFILE
+
+When the admin clicks on a student, open a complete student profile.
+
+Use separate tabs:
+
+1. Personal Information.
+2. Registration Details.
+3. Offer Letter.
+4. Assigned Tasks.
+5. Project Submissions.
+6. Admin Feedback.
+7. Internship Progress.
+8. Certificate.
+9. LOR.
+
+The admin should be able to understand the complete internship history of that student from one place.
+
+---
+
+# 18. SEPARATE STUDENT AND ADMIN ACCESS
+
+This requirement is extremely important.
+
+Create two separate application layouts.
+
+### STUDENT ROUTES
+
+/student/register
+
+/student/offer-letter
+
+/student/dashboard
+
+/student/tasks
+
+/student/submission
+
+/student/certificate
+
+/student/profile
+
+### ADMIN ROUTES
+
+/admin/login
+
+/admin/dashboard
+
+/admin/students
+
+/admin/offer-letters
+
+/admin/tasks
+
+/admin/submissions
+
+/admin/certificates
+
+### Access Requirements
+
+- Student registration should not expose admin access.
+- Admin login should be separate.
+- Students must not see admin navigation.
+- Students must not access admin management pages through normal navigation.
+- Admin must have access to all student management features.
+- Students should only see their own information.
+- Logout must clear the appropriate demo session.
+- Protect routes using frontend role checks.
+
+Use separate navigation components for student and admin layouts.
+
+NOTE: Frontend route guards are demonstration-level separation only. Real security requires backend authentication and authorization.
+
+---
+
+# 19. DATA MANAGEMENT AND FRONTEND LOGIC
+
+Use a centralized frontend state management approach.
+
+Suggested entities:
+
+- Students.
+- Admin.
+- Internship Domains.
+- Applications.
+- Offer Letters.
+- Tasks.
+- Task Assignments.
+- Project Submissions.
+- Feedback.
+- Certificates.
+- Letters of Recommendation.
+
+### Complete Demo Workflow
+
+1. Student opens the website.
+2. Student completes registration.
+3. Student ID is generated.
+4. Registration data is saved.
+5. Offer letter is generated automatically.
+6. Student sees the offer letter.
+7. Student enters the dashboard.
+8. Student sees the five-step tracker.
+9. Student sees assigned internship tasks.
+10. Student starts and completes tasks.
+11. Student submits project work.
+12. Admin logs into the admin portal.
+13. Admin sees the new student registration.
+14. Admin reviews student details.
+15. Admin manages internship tasks.
+16. Admin reviews project submissions.
+17. Admin adds feedback.
+18. Admin approves or requests revision.
+19. Admin issues certificate and LOR after approval.
+20. Student sees issued documents.
+21. Student can download the certificate and LOR.
+
+All changes must be reflected in both interfaces.
+
+Use localStorage for persistence.
+
+Use a shared frontend data layer and listen for storage changes where needed so that changes appear across open tabs of the same browser.
+
+Provide a Reset Demo Data option inside the admin settings to restore the initial sample data.
+
+---
+
+# 20. TECHNOLOGY STACK
+
+Use the following frontend technologies:
+
+- React.js.
+- JavaScript.
+- Tailwind CSS.
+- React Router.
+- Lucide React.
+- localStorage.
+- React Context API or another lightweight state management approach.
+- Recharts for dashboard charts.
+- Suitable client-side PDF generation library.
+- HTML/CSS printing functionality.
+
+Do not use:
+
+- Supabase.
+- Firebase.
+- MySQL.
+- MongoDB.
+- Backend APIs.
+- Server-side authentication.
+- External database connections.
+
+Keep the code clean, modular and organized.
+
+---
+
+# 21. PROJECT STRUCTURE
+
+Organize the project into reusable components and separate pages.
+
+Suggested structure:
+
+src/
+
+  components/
+
+    Logo.jsx
+
+    StudentSidebar.jsx
+
+    AdminSidebar.jsx
+
+    RetroWindow.jsx
+
+    RetroButton.jsx
+
+    ProgressTracker.jsx
+
+    DashboardCard.jsx
+
+    DataTable.jsx
+
+    StatusBadge.jsx
+
+    OfferLetterPreview.jsx
+
+    CertificatePreview.jsx
+
+    LORPreview.jsx
+
+    NotificationDialog.jsx
+
+  pages/
+
+    student/
+
+      Registration.jsx
+
+      OfferLetter.jsx
+
+      Dashboard.jsx
+
+      Tasks.jsx
+
+      ProjectSubmission.jsx
+
+      Certificate.jsx
+
+      Profile.jsx
+
+    admin/
+
+      AdminLogin.jsx
+
+      AdminDashboard.jsx
+
+      StudentManagement.jsx
+
+      OfferLetterManagement.jsx
+
+      TaskManagement.jsx
+
+      SubmissionManagement.jsx
+
+      CertificateManagement.jsx
+
+  context/
+
+    AppContext.jsx
+
+    AuthContext.jsx
+
+  services/
+
+    storageService.js
+
+    offerLetterService.js
+
+    certificateService.js
+
+    taskService.js
+
+  utils/
+
+    generateStudentId.js
+
+    generateCertificateId.js
+
+  App.jsx
+
+  main.jsx
+
+  index.css
+
+This is a suggested structure. You may improve it while maintaining proper separation of responsibilities.
+
+---
+
+# 22. RESPONSIVE DESIGN
+
+The complete website must work on:
+
+- Desktop.
+- Laptop.
+- Tablet.
+- Mobile.
+
+### Desktop
+
+Use sidebar navigation and large retro application windows.
+
+### Tablet
+
+Adjust the sidebar and content layout.
+
+### Mobile
+
+- Use collapsible navigation.
+- Stack dashboard cards.
+- Convert the five-step tracker into a vertical timeline.
+- Make tables horizontally scrollable or use responsive cards.
+- Ensure forms fit the screen.
+- Keep buttons accessible.
+
+Do not allow horizontal page overflow.
+
+---
+
+# 23. FINAL QUALITY AND FUNCTIONALITY CHECKLIST
+
+Before completing the project, verify the following:
+
+REGISTRATION:
+- Registration form works.
+- Validation works.
+- Student ID generates.
+- Duplicate email is prevented.
+- Student data persists.
+
+OFFER LETTER:
+- Offer letter generates automatically.
+- Original template is respected.
+- Only name, domain and date change.
+- PDF preview and download work.
+
+STUDENT DASHBOARD:
+- Student sees personal details.
+- Navigation works.
+- Five-step tracker updates.
+- Progress percentage updates.
+- Tasks appear correctly.
+
+TASKS:
+- Students can view tasks.
+- Students can submit work.
+- Status updates correctly.
+- Feedback appears.
+
+ADMIN:
+- Separate login works.
+- Admin dashboard works.
+- New registrations appear.
+- Search and filtering work.
+- Tasks can be managed.
+- Submissions can be reviewed.
+- Feedback can be added.
+- Certificates can be issued.
+
+CERTIFICATES:
+- Only eligible students can receive certificates.
+- Certificate preview works.
+- LOR preview works.
+- PDF downloads work.
+- Student dashboard updates after issuance.
+
+BRANDING:
+- Original Skillora logo appears throughout the website.
+- Logo is not distorted or redesigned.
+- Website consistently follows the retro theme.
+
+PERSISTENCE:
+- Data remains after refreshing.
+- Changes are reflected across student and admin views in the same browser.
+- Demo data can be reset.
+
+Do not leave any non-functional buttons or empty pages.
+
+---
+
+# 24. FINAL DEVELOPMENT INSTRUCTIONS
+
+Build the entire application, not just its visual appearance.
+
+Prioritize these things:
+
+1. Complete frontend functionality.
+2. Separate student and admin interfaces.
+3. Original Skillora company logo integration.
+4. Automatic offer-letter generation.
+5. Five-step internship tracker.
+6. Task and project management.
+7. Certificate and LOR issuance.
+8. Consistent old-school retro computer theme.
+9. Responsive design.
+10. Persistent demo data.
+
+Do not simplify or remove any feature described in this prompt.
+
+If a feature requires a backend in production, simulate it appropriately using frontend state and localStorage.
+
+Do not pretend simulated features are real server-side functionality.
+
+### FINAL EXPECTED RESULT
+
+Create a complete, working and professional **SKILLORA RETRO INTERNSHIP MANAGEMENT PORTAL**.
+
+The student portal should feel like progressing through an old-school computer game, where students register, complete internship quests, track progress and unlock their achievements.
+
+The admin portal should feel like a vintage computer control room where the company can manage students, offer letters, tasks, submissions, certificates and LORs.
+
+The original Skillora company logo must be the central brand identity.
+
+The final result must be a fully interactive frontend demonstration that can run without connecting any backend or database.
+
+DO NOT STOP AFTER CREATING THE REGISTRATION PAGE.
+
+BUILD ALL PAGES, ALL NAVIGATION AND ALL FUNCTIONALITY DESCRIBED ABOVE.

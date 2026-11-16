@@ -1,0 +1,6 @@
+{
+  "name": "Skillora – Retro Internship Management Portal",
+  "description": "Complete retro-styled internship management portal for Skillora with student quest tracking, automatic offer letters, admin control room, and certificate/LOR issuance.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

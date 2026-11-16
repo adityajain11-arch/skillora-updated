@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+:root {
+  --retro-cream: #F4EBD0;
+  --retro-navy: #182747;
+  --retro-blue: #4169E1;
+  --retro-yellow: #F4C542;
+  --retro-green: #4E8B62;
+  --retro-red: #C94C4C;
+  --retro-beige: #FFF8E7;
+  --retro-border: #303030;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--retro-cream);
+  color: var(--retro-navy);
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.font-pixel {
+  font-family: 'Press Start 2P', monospace;
+}
+
+.font-vt {
+  font-family: 'VT323', monospace;
+}
+
+.font-mono-data {
+  font-family: 'IBM Plex Mono', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.font-formal {
+  font-family: 'DM Sans', Georgia, serif;
+}
+
+.font-certificate-serif {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+/* Subtle vintage OS desktop grid pattern */
+.retro-desktop-bg {
+  background-color: #F4EBD0;
+  background-image:
+    linear-gradient(to right, rgba(48, 48, 48, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(48, 48, 48, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Control room dark navy subtle grid for admin login/accents */
+.retro-admin-bg {
+  background-color: #E7DEC2;
+  background-image:
+    radial-gradient(rgba(24, 39, 71, 0.14) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+.retro-shadow {
+  box-shadow: 4px 4px 0px #303030;
+}
+
+.retro-shadow-sm {
+  box-shadow: 2px 2px 0px #303030;
+}
+
+.retro-bevel-in {
+  box-shadow: inset 2px 2px 0px rgba(48, 48, 48, 0.2);
+}
+
+.retro-dotted-hr {
+  border: 0;
+  border-top: 2px dotted #303030;
+  opacity: 0.35;
+}
+
+/* Custom retro scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F4EBD0;
+  border-left: 2px solid #303030;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #182747;
+  border: 2px solid #F4EBD0;
+}
+
+@media print {
+  body {
+    background: #ffffff !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only-container {
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
