@@ -1,5 +1,6 @@
 import {
   CertificateRecord,
+  DocumentTemplateConfig,
   InternshipChangeLogEntry,
   InternshipDomain,
   InternshipStatus,
@@ -133,6 +134,23 @@ interface LORRow {
   completion_date: string;
   issued_at: string;
   status: string;
+}
+
+interface DocumentTemplateRow {
+  id: string;
+  title: string;
+  heading: string;
+  body_text: string;
+  primary_color: string;
+  secondary_color: string;
+  font_size: string;
+  font_family: string;
+  text_align: string;
+  logo_url: string | null;
+  signature_name: string;
+  signature_title: string;
+  footer_text: string;
+  updated_at: string;
 }
 
 function toStudentRow(s: Student): StudentRow {
@@ -409,6 +427,44 @@ function fromLORRow(r: LORRow): LORRecord {
   };
 }
 
+function toDocumentTemplateRow(d: DocumentTemplateConfig): DocumentTemplateRow {
+  return {
+    id: d.id,
+    title: d.title,
+    heading: d.heading,
+    body_text: d.bodyText,
+    primary_color: d.primaryColor,
+    secondary_color: d.secondaryColor,
+    font_size: d.fontSize,
+    font_family: d.fontFamily,
+    text_align: d.textAlign,
+    logo_url: d.logoUrl || null,
+    signature_name: d.signatureName,
+    signature_title: d.signatureTitle,
+    footer_text: d.footerText,
+    updated_at: d.updatedAt,
+  };
+}
+
+function fromDocumentTemplateRow(r: DocumentTemplateRow): DocumentTemplateConfig {
+  return {
+    id: r.id as DocumentTemplateConfig['id'],
+    title: r.title,
+    heading: r.heading,
+    bodyText: r.body_text,
+    primaryColor: r.primary_color,
+    secondaryColor: r.secondary_color,
+    fontSize: r.font_size,
+    fontFamily: r.font_family,
+    textAlign: r.text_align as DocumentTemplateConfig['textAlign'],
+    logoUrl: r.logo_url ?? '',
+    signatureName: r.signature_name,
+    signatureTitle: r.signature_title,
+    footerText: r.footer_text,
+    updatedAt: r.updated_at,
+  };
+}
+
 export interface SupabaseHealthResult {
   connected: boolean;
   tablesReady: boolean;
@@ -482,6 +538,7 @@ export async function loadPortalStateFromSupabase(): Promise<Partial<PortalState
     projSubsRes,
     certsRes,
     lorsRes,
+    templatesRes,
   ] = await Promise.all([
     supabase.from('offer_letters').select('*').order('version', { ascending: false }),
     supabase.from('internship_change_logs').select('*').order('changed_at', { ascending: false }),
@@ -491,6 +548,7 @@ export async function loadPortalStateFromSupabase(): Promise<Partial<PortalState
     supabase.from('project_submissions').select('*').order('submission_date', { ascending: false }),
     supabase.from('certificates').select('*').order('issued_at', { ascending: false }),
     supabase.from('lors').select('*').order('issued_at', { ascending: false }),
+    supabase.from('document_templates').select('*'),
   ]);
 
   return {
@@ -511,6 +569,9 @@ export async function loadPortalStateFromSupabase(): Promise<Partial<PortalState
       ? (certsRes.data as CertificateRow[]).map(fromCertificateRow)
       : [],
     lors: lorsRes.data ? (lorsRes.data as LORRow[]).map(fromLORRow) : [],
+    documentTemplates: templatesRes.data
+      ? (templatesRes.data as DocumentTemplateRow[]).map(fromDocumentTemplateRow)
+      : [],
   };
 }
 
@@ -543,6 +604,16 @@ export async function insertStudentRegistrationToSupabase(
     };
   }
 
+  return { ok: true };
+}
+
+export async function saveDocumentTemplateToSupabase(
+  template: DocumentTemplateConfig
+): Promise<{ ok: boolean; error?: string }> {
+  const { error } = await supabase
+    .from('document_templates')
+    .upsert(toDocumentTemplateRow(template));
+  if (error) return { ok: false, error: error.message };
   return { ok: true };
 }
 
@@ -602,6 +673,13 @@ export async function seedFullStateToSupabase(portalState: PortalState): Promise
   }
   if (portalState.lors.length > 0) {
     secondaryOps.push(supabase.from('lors').upsert(portalState.lors.map(toLORRow)));
+  }
+  if (portalState.documentTemplates.length > 0) {
+    secondaryOps.push(
+      supabase
+        .from('document_templates')
+        .upsert(portalState.documentTemplates.map(toDocumentTemplateRow))
+    );
   }
 
   const results = await Promise.all(secondaryOps);

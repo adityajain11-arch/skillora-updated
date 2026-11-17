@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import {
   CertificateRecord,
+  DocumentTemplateConfig,
   InternshipChangeLogEntry,
   InternshipDomain,
   InternshipStatus,
@@ -35,6 +36,7 @@ import {
   insertStudentRegistrationToSupabase,
   loadPortalStateFromSupabase,
   seedFullStateToSupabase,
+  saveDocumentTemplateToSupabase,
 } from '../services/supabaseSyncService';
 
 export interface RegisterStudentInput {
@@ -135,6 +137,7 @@ interface AppContextValue {
   ) => void;
   issueCertificate: (studentId: string) => CertificateRecord | null;
   issueLOR: (studentId: string) => LORRecord | null;
+  saveDocumentTemplate: (template: DocumentTemplateConfig) => Promise<{ ok: boolean; error?: string }>;
   resetDemoData: () => void;
 }
 
@@ -232,6 +235,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             : hasRemoteStudents
             ? []
             : prev.lors,
+        documentTemplates:
+          (remote.documentTemplates?.length ?? 0) > 0
+            ? remote.documentTemplates!
+            : (prev.documentTemplates?.length ?? 0) > 0
+            ? prev.documentTemplates
+            : initialSeedState.documentTemplates,
       }));
       return true;
     } catch {
@@ -1164,6 +1173,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     [state.students, state.projectSubmissions, state.lors, commit]
   );
 
+  const saveDocumentTemplate = useCallback(
+    async (template: DocumentTemplateConfig): Promise<{ ok: boolean; error?: string }> => {
+      const res = await saveDocumentTemplateToSupabase(template);
+      if (res.ok) {
+        commit((prev) => ({
+          ...prev,
+          documentTemplates: [
+            template,
+            ...prev.documentTemplates.filter((d) => d.id !== template.id),
+          ],
+        }));
+      }
+      return res;
+    },
+    [commit]
+  );
+
   const resetDemoData = useCallback(() => {
     const fresh = resetPortalState();
     setState(fresh);
@@ -1199,6 +1225,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         reviewCapstoneProject,
         issueCertificate,
         issueLOR,
+        saveDocumentTemplate,
         resetDemoData,
       }}
     >

@@ -25,10 +25,12 @@ interface AdminSidebarProps {
 }
 
 const ADMIN_NAV = [
-  { to: '/admin/dashboard', label: 'Dashboard', icon: Terminal },
+  { to: '/admin/dashboard', label: 'Overview', icon: Terminal },
   { to: '/admin/students', label: 'Student Management', icon: Users },
-  { to: '/admin/internships', label: 'INTERNSHIP MANAGEMENT.EXE', icon: SlidersHorizontal },
+  { to: '/admin/internships', label: 'Internship Management', icon: SlidersHorizontal },
   { to: '/admin/offer-letters', label: 'Offer Letter Management', icon: FileSpreadsheet },
+  { to: '/admin/documents/offer-letter', label: 'Document Customization', icon: Award },
+  { to: '/admin/issued-documents', label: 'Issued Documents', icon: Award },
   { to: '/admin/tasks', label: 'Task Management', icon: ClipboardList },
   { to: '/admin/submissions', label: 'Project Submissions', icon: FolderGit2 },
   { to: '/admin/certificates', label: 'Certificate Management', icon: Award },

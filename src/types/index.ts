@@ -152,6 +152,23 @@ export interface LORRecord {
   status: 'ISSUED';
 }
 
+export interface DocumentTemplateConfig {
+  id: 'offer_letter' | 'certificate' | 'lor';
+  title: string;
+  heading: string;
+  bodyText: string;
+  primaryColor: string;
+  secondaryColor: string;
+  fontSize: string;
+  fontFamily: string;
+  textAlign: 'left' | 'center' | 'right';
+  logoUrl: string;
+  signatureName: string;
+  signatureTitle: string;
+  footerText: string;
+  updatedAt: string;
+}
+
 export interface PortalState {
   students: Student[];
   offerLetters: OfferLetterRecord[];
@@ -162,6 +179,7 @@ export interface PortalState {
   projectSubmissions: ProjectSubmission[];
   certificates: CertificateRecord[];
   lors: LORRecord[];
+  documentTemplates: DocumentTemplateConfig[];
 }
 
 export interface AuthSession {

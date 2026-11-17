@@ -129,6 +129,24 @@ create table if not exists public.lors (
   status text not null default 'ISSUED'
 );
 
+-- 10. Document Templates Customization Table
+create table if not exists public.document_templates (
+  id text primary key,
+  title text not null,
+  heading text not null,
+  body_text text not null,
+  primary_color text not null,
+  secondary_color text not null,
+  font_size text not null,
+  font_family text not null,
+  text_align text not null,
+  logo_url text,
+  signature_name text not null,
+  signature_title text not null,
+  footer_text text not null,
+  updated_at timestamptz not null default now()
+);
+
 -- Useful Indexes
 create index if not exists idx_students_email on public.students(email);
 create index if not exists idx_offer_letters_student_id on public.offer_letters(student_id);
@@ -147,6 +165,7 @@ alter table public.task_submissions enable row level security;
 alter table public.project_submissions enable row level security;
 alter table public.certificates enable row level security;
 alter table public.lors enable row level security;
+alter table public.document_templates enable row level security;
 
 drop policy if exists "skillora_public_all_students" on public.students;
 create policy "skillora_public_all_students" on public.students for all using (true) with check (true);
@@ -174,3 +193,59 @@ create policy "skillora_public_all_certificates" on public.certificates for all 
 
 drop policy if exists "skillora_public_all_lors" on public.lors;
 create policy "skillora_public_all_lors" on public.lors for all using (true) with check (true);
+
+drop policy if exists "skillora_public_all_document_templates" on public.document_templates;
+create policy "skillora_public_all_document_templates" on public.document_templates for all using (true) with check (true);
+
+-- =========================================================================
+-- DEDICATED ADMIN TABLES ATTACHED WITH PREVIOUS TABLES
+-- =========================================================================
+
+-- 11. Admin Users Table
+create table if not exists public.admin_users (
+  email text primary key,
+  full_name text not null default 'Skillora Administrator',
+  role text not null default 'Super Admin',
+  created_at timestamptz not null default now()
+);
+
+-- Seed default admin user
+insert into public.admin_users (email, full_name, role)
+values ('admin22@skillora.com', 'Aditya Jain', 'Super Admin')
+on conflict (email) do nothing;
+
+-- 12. Admin Audit Logs Table (Attached with students & admin actions)
+create table if not exists public.admin_audit_logs (
+  id text primary key,
+  admin_email text not null,
+  student_id text references public.students(id) on delete set null,
+  action_type text not null,
+  action_description text not null,
+  created_at timestamptz not null default now()
+);
+
+-- 13. Admin Document Authorizations Table (Attached with students for strict issuance control)
+create table if not exists public.admin_document_authorizations (
+  id text primary key,
+  student_id text not null references public.students(id) on delete cascade,
+  document_type text not null, -- 'offer_letter' | 'certificate' | 'lor'
+  authorized_by text not null,
+  authorized_at timestamptz not null default now(),
+  status text not null default 'AUTHORIZED',
+  unique(student_id, document_type)
+);
+
+-- Enable RLS for new admin tables
+alter table public.admin_users enable row level security;
+alter table public.admin_audit_logs enable row level security;
+alter table public.admin_document_authorizations enable row level security;
+
+drop policy if exists "skillora_public_all_admin_users" on public.admin_users;
+create policy "skillora_public_all_admin_users" on public.admin_users for all using (true) with check (true);
+
+drop policy if exists "skillora_public_all_admin_audit_logs" on public.admin_audit_logs;
+create policy "skillora_public_all_admin_audit_logs" on public.admin_audit_logs for all using (true) with check (true);
+
+drop policy if exists "skillora_public_all_admin_document_authorizations" on public.admin_document_authorizations;
+create policy "skillora_public_all_admin_document_authorizations" on public.admin_document_authorizations for all using (true) with check (true);
+

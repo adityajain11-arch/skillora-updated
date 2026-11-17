@@ -26,7 +26,16 @@ export function loadPortalState(): PortalState {
     ) {
       throw new Error('Invalid state shape');
     }
-    return parsed;
+    return {
+      ...parsed,
+      documentTemplates: Array.isArray(parsed.documentTemplates)
+        ? parsed.documentTemplates
+        : initialSeedState.documentTemplates,
+      certificates: Array.isArray(parsed.certificates) ? parsed.certificates : [],
+      lors: Array.isArray(parsed.lors) ? parsed.lors : [],
+      taskSubmissions: Array.isArray(parsed.taskSubmissions) ? parsed.taskSubmissions : [],
+      projectSubmissions: Array.isArray(parsed.projectSubmissions) ? parsed.projectSubmissions : [],
+    };
   } catch {
     const cloned = structuredClone(initialSeedState);
     localStorage.setItem(PORTAL_STORAGE_KEY, JSON.stringify(cloned));

@@ -21,6 +21,8 @@ import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { StudentManagement } from './pages/admin/StudentManagement';
 import { InternshipManagement } from './pages/admin/InternshipManagement';
 import { OfferLetterManagement } from './pages/admin/OfferLetterManagement';
+import { DocumentCustomization } from './pages/admin/DocumentCustomization';
+import { IssuedDocuments } from './pages/admin/IssuedDocuments';
 import { TaskManagement } from './pages/admin/TaskManagement';
 import { SubmissionManagement } from './pages/admin/SubmissionManagement';
 import { CertificateManagement } from './pages/admin/CertificateManagement';
@@ -65,6 +67,9 @@ const PortalRoutes: React.FC = () => {
         <Route path="/admin/students" element={<StudentManagement />} />
         <Route path="/admin/internships" element={<InternshipManagement />} />
         <Route path="/admin/offer-letters" element={<OfferLetterManagement />} />
+        <Route path="/admin/documents" element={<DocumentCustomization />} />
+        <Route path="/admin/documents/:docType" element={<DocumentCustomization />} />
+        <Route path="/admin/issued-documents" element={<IssuedDocuments />} />
         <Route path="/admin/tasks" element={<TaskManagement />} />
         <Route path="/admin/submissions" element={<SubmissionManagement />} />
         <Route path="/admin/certificates" element={<CertificateManagement />} />
