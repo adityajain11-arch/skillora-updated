@@ -107,6 +107,7 @@ export interface TaskSubmissionRecord {
   fileName?: string;
   fileSize?: string;
   fileType?: string;
+  projectUrl?: string;
   startedAt?: string;
   submittedAt?: string;
   adminFeedback?: string;

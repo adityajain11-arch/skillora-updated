@@ -37,6 +37,7 @@ export const Tasks: React.FC = () => {
 
   // Task submission modal form state
   const [description, setDescription] = useState('');
+  const [projectUrl, setProjectUrl] = useState('');
   const [selectedFile, setSelectedFile] = useState<{
     name: string;
     size: string;
@@ -59,6 +60,7 @@ export const Tasks: React.FC = () => {
     const existing = getTaskSubmissionForStudent(student.id, task.id);
     setSelectedTask(task);
     setDescription(existing?.projectDescription || '');
+    setProjectUrl(existing?.projectUrl || '');
     setSelectedFile(
       existing?.fileName
         ? {
@@ -93,6 +95,10 @@ export const Tasks: React.FC = () => {
       setFormError('Please provide a project description (at least 10 characters).');
       return;
     }
+    if (!projectUrl.trim() || (!projectUrl.startsWith('http://') && !projectUrl.startsWith('https://'))) {
+      setFormError('Mandatory: Please provide a valid live project URL (starting with http:// or https://). Task submission cannot proceed without a live link.');
+      return;
+    }
     if (!selectedFile) {
       setFormError('Please select a project file to upload (simulated metadata upload).');
       return;
@@ -103,6 +109,7 @@ export const Tasks: React.FC = () => {
       fileName: selectedFile.name,
       fileSize: selectedFile.size,
       fileType: selectedFile.type,
+      projectUrl: projectUrl.trim(),
     });
     setSelectedTask(null);
     setToastMsg(`Task #${selectedTask.taskNumber} submitted for Skillora mentor review!`);
@@ -321,6 +328,27 @@ export const Tasks: React.FC = () => {
                           placeholder="Describe your implementation, tools used, and key outcomes..."
                           className="w-full px-3 py-2 bg-white border-2 border-[#303030] text-sm text-[#182747] focus:outline-none focus:border-[#4169E1]"
                         />
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor="task-live-url"
+                          className="block text-xs font-bold uppercase text-[#182747] mb-1.5"
+                        >
+                          Live Project URL / Deployment Link * (Mandatory for task submission)
+                        </label>
+                        <input
+                          id="task-live-url"
+                          type="url"
+                          required
+                          value={projectUrl}
+                          onChange={(e) => setProjectUrl(e.target.value)}
+                          placeholder="https://your-live-project-url.com"
+                          className="w-full px-3 py-2 bg-white border-2 border-[#303030] text-sm text-[#182747] focus:outline-none focus:border-[#4169E1] font-mono-data"
+                        />
+                        <p className="text-[11px] text-[#C94C4C] font-semibold mt-1">
+                          Required: You cannot submit this task without adding an active live link.
+                        </p>
                       </div>
 
                       <div>

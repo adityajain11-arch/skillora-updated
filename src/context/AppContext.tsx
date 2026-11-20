@@ -100,6 +100,7 @@ interface AppContextValue {
       fileName: string;
       fileSize: string;
       fileType: string;
+      projectUrl: string;
     }
   ) => void;
   reviewTaskSubmission: (
@@ -754,6 +755,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         fileName: string;
         fileSize: string;
         fileType: string;
+        projectUrl: string;
       }
     ) => {
       commit((prev) => {
@@ -779,6 +781,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                     fileName: payload.fileName,
                     fileSize: payload.fileSize,
                     fileType: payload.fileType,
+                    projectUrl: payload.projectUrl,
                     submittedAt: now,
                   }
                 : s
@@ -794,6 +797,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           fileName: payload.fileName,
           fileSize: payload.fileSize,
           fileType: payload.fileType,
+          projectUrl: payload.projectUrl,
           startedAt: now,
           submittedAt: now,
         };

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Award, Check, FileText, RefreshCw, Save, Upload, Eye, ScrollText } from 'lucide-react';
+import { Award, FileText, RefreshCw, Save, Upload, Eye, ScrollText, CheckCircle2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { DocumentTemplateConfig, InternshipDomain } from '../../types';
 import { RetroWindow } from '../../components/RetroWindow';
@@ -43,15 +43,15 @@ export const DocumentCustomization: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [toastType, setToastType] = useState<'success' | 'error'>('success');
-  const [activePreviewMode, setActivePreviewMode] = useState<'visual' | 'code'>('visual');
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
 
-  // Sync form when tab changes
   React.useEffect(() => {
     const found =
       state.documentTemplates.find((d) => d.id === activeTab) ||
       defaultTemplates.find((d) => d.id === activeTab);
     if (found) {
       setFormState({ ...found });
+      setUploadedFileName(null);
     }
   }, [activeTab, state.documentTemplates]);
 
@@ -59,9 +59,10 @@ export const DocumentCustomization: React.FC = () => {
     navigate(`/admin/documents/${tab}`);
   };
 
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDocumentFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setUploadedFileName(file.name);
       const reader = new FileReader();
       reader.onload = (uploadEvent) => {
         setFormState((prev) => ({
@@ -84,7 +85,7 @@ export const DocumentCustomization: React.FC = () => {
       const res = await saveDocumentTemplate(updated);
       if (res.ok) {
         setToastType('success');
-        setToastMessage(`Successfully saved changes for ${formState.title} to Supabase!`);
+        setToastMessage(`Successfully saved ${formState.title} document template & uploaded asset to Supabase!`);
       } else {
         setToastType('error');
         setToastMessage(`Failed to save to Supabase: ${res.error || 'Unknown error'}`);
@@ -101,12 +102,13 @@ export const DocumentCustomization: React.FC = () => {
     const original = defaultTemplates.find((d) => d.id === activeTab);
     if (original) {
       setFormState({ ...original });
+      setUploadedFileName(null);
       setToastType('success');
-      setToastMessage('Reset template to default version.');
+      setToastMessage('Reset document template to default version.');
     }
   };
 
-  // Dummy student & record for preview
+  // Dummy sample records for live preview
   const sampleStudent = state.students[0] || {
     id: 'SKL-2026-1001',
     fullName: 'Aarav Mehta',
@@ -164,15 +166,14 @@ export const DocumentCustomization: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header & Subsections Navigation */}
       <RetroWindow title="DOCUMENT_CUSTOMIZATION_HUB.EXE" headerColor="navy">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b-2 border-dotted border-[#303030]/40">
           <div>
             <h1 className="font-pixel text-xs sm:text-sm text-[#182747]">
-              ADMIN DOCUMENT CUSTOMIZATION &amp; APPROVAL
+              ADMIN DOCUMENT TEMPLATE &amp; PDF/IMAGE UPLOAD
             </h1>
             <p className="text-sm text-[#303030] mt-1">
-              Customize templates, upload branding assets, edit typography and layout, and persist changes securely in Supabase.
+              Upload or replace PDF documents and images for Offer Letters, Certificates, and LORs with auto-generation support.
             </p>
           </div>
 
@@ -204,205 +205,47 @@ export const DocumentCustomization: React.FC = () => {
           </div>
         </div>
 
-        {/* Customization Workspace */}
+        {/* Upload & Preview Workspace */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
-          {/* Left Column: Editor Form */}
-          <div className="lg:col-span-6 space-y-4">
-            <div className="bg-[#F4EBD0] border-2 border-[#303030] p-3">
+          {/* Left Column: Upload Space Only */}
+          <div className="lg:col-span-5 space-y-4">
+            <div className="bg-[#F4EBD0] border-2 border-[#303030] p-4">
               <span className="font-pixel text-[9px] text-[#4169E1] uppercase">
-                EDITING: {formState.title}
+                ACTIVE SECTION: {formState.title}
               </span>
-              <p className="text-xs text-[#303030] mt-0.5">
-                Last updated: {new Date(formState.updatedAt).toLocaleString()}
+              <p className="text-xs text-[#303030] mt-1 leading-relaxed">
+                Upload your official PDF document or high-resolution design image template. This replaces the active template and persists securely in Supabase.
               </p>
             </div>
 
-            <form onSubmit={handleSave} className="space-y-4 bg-white border-2 border-[#303030] p-4">
-              <div>
-                <label className="block text-xs font-bold uppercase text-[#182747] mb-1">
-                  Template Title
-                </label>
-                <input
-                  type="text"
-                  value={formState.title}
-                  onChange={(e) => setFormState({ ...formState, title: e.target.value })}
-                  className="w-full px-3 py-2 bg-white border-2 border-[#303030] text-xs font-bold text-[#182747]"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase text-[#182747] mb-1">
-                  Document Heading
-                </label>
-                <input
-                  type="text"
-                  value={formState.heading}
-                  onChange={(e) => setFormState({ ...formState, heading: e.target.value })}
-                  className="w-full px-3 py-2 bg-white border-2 border-[#303030] text-xs font-bold text-[#182747]"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase text-[#182747] mb-1">
-                  Body Text &amp; Paragraphs (Supports [StudentName], [Domain], [StudentId])
-                </label>
-                <textarea
-                  rows={4}
-                  value={formState.bodyText}
-                  onChange={(e) => setFormState({ ...formState, bodyText: e.target.value })}
-                  className="w-full px-3 py-2 bg-white border-2 border-[#303030] text-xs text-[#182747]"
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold uppercase text-[#182747] mb-1">
-                    Primary Color
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="color"
-                      value={formState.primaryColor}
-                      onChange={(e) => setFormState({ ...formState, primaryColor: e.target.value })}
-                      className="w-10 h-8 border-2 border-[#303030] cursor-pointer p-0"
-                    />
-                    <input
-                      type="text"
-                      value={formState.primaryColor}
-                      onChange={(e) => setFormState({ ...formState, primaryColor: e.target.value })}
-                      className="w-full px-2 py-1.5 border-2 border-[#303030] font-mono-data text-xs"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase text-[#182747] mb-1">
-                    Secondary Color
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="color"
-                      value={formState.secondaryColor}
-                      onChange={(e) => setFormState({ ...formState, secondaryColor: e.target.value })}
-                      className="w-10 h-8 border-2 border-[#303030] cursor-pointer p-0"
-                    />
-                    <input
-                      type="text"
-                      value={formState.secondaryColor}
-                      onChange={(e) => setFormState({ ...formState, secondaryColor: e.target.value })}
-                      className="w-full px-2 py-1.5 border-2 border-[#303030] font-mono-data text-xs"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <label className="block text-xs font-bold uppercase text-[#182747] mb-1">
-                    Font Size
-                  </label>
-                  <select
-                    value={formState.fontSize}
-                    onChange={(e) => setFormState({ ...formState, fontSize: e.target.value })}
-                    className="w-full px-2 py-2 border-2 border-[#303030] text-xs bg-white"
-                  >
-                    <option value="10">10pt</option>
-                    <option value="10.5">10.5pt</option>
-                    <option value="11">11pt</option>
-                    <option value="12">12pt</option>
-                    <option value="13">13pt</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase text-[#182747] mb-1">
-                    Font Family
-                  </label>
-                  <select
-                    value={formState.fontFamily}
-                    onChange={(e) => setFormState({ ...formState, fontFamily: e.target.value })}
-                    className="w-full px-2 py-2 border-2 border-[#303030] text-xs bg-white"
-                  >
-                    <option value="helvetica">Helvetica / Sans</option>
-                    <option value="times">Times / Serif</option>
-                    <option value="courier">Courier / Mono</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase text-[#182747] mb-1">
-                    Text Align
-                  </label>
-                  <select
-                    value={formState.textAlign}
-                    onChange={(e) => setFormState({ ...formState, textAlign: e.target.value as any })}
-                    className="w-full px-2 py-2 border-2 border-[#303030] text-xs bg-white"
-                  >
-                    <option value="left">Left</option>
-                    <option value="center">Center</option>
-                    <option value="right">Right</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold uppercase text-[#182747] mb-1">
-                    Signature Name
-                  </label>
+            <form onSubmit={handleSave} className="space-y-4 bg-white border-2 border-[#303030] p-5">
+              <div className="border-2 border-dashed border-[#303030] p-6 text-center bg-[#FFF8E7] hover:bg-[#F4EBD0]/40 transition-colors">
+                <Upload className="w-10 h-10 mx-auto text-[#182747] mb-2" />
+                <label className="block text-xs font-bold uppercase text-[#182747] cursor-pointer">
+                  <span>Click to Upload PDF or Image</span>
                   <input
-                    type="text"
-                    value={formState.signatureName}
-                    onChange={(e) => setFormState({ ...formState, signatureName: e.target.value })}
-                    className="w-full px-3 py-2 border-2 border-[#303030] text-xs font-bold"
+                    type="file"
+                    accept=".pdf,image/*"
+                    onChange={handleDocumentFileUpload}
+                    className="hidden"
                   />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase text-[#182747] mb-1">
-                    Signature Title
-                  </label>
-                  <input
-                    type="text"
-                    value={formState.signatureTitle}
-                    onChange={(e) => setFormState({ ...formState, signatureTitle: e.target.value })}
-                    className="w-full px-3 py-2 border-2 border-[#303030] text-xs font-bold"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase text-[#182747] mb-1">
-                  Footer / Disclaimer Text
                 </label>
-                <input
-                  type="text"
-                  value={formState.footerText}
-                  onChange={(e) => setFormState({ ...formState, footerText: e.target.value })}
-                  className="w-full px-3 py-2 border-2 border-[#303030] text-xs"
-                />
+                <p className="text-[11px] text-gray-600 mt-1">Supports PDF, PNG, JPG (Max 15MB)</p>
+                {uploadedFileName && (
+                  <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 bg-[#4E8B62] text-white text-xs font-mono-data font-bold">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>{uploadedFileName}</span>
+                  </div>
+                )}
+                {formState.logoUrl && !uploadedFileName && (
+                  <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 bg-[#4169E1] text-white text-xs font-mono-data font-bold">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>Document Template Loaded ✓</span>
+                  </div>
+                )}
               </div>
 
-              <div>
-                <label className="block text-xs font-bold uppercase text-[#182747] mb-1">
-                  Upload / Replace Logo / Stamp Asset
-                </label>
-                <div className="flex items-center gap-3">
-                  <label className="px-3 py-2 bg-[#FFF8E7] border-2 border-[#303030] text-xs font-bold hover:bg-[#F4EBD0] cursor-pointer flex items-center gap-1.5">
-                    <Upload className="w-3.5 h-3.5" />
-                    <span>Upload Image / Stamp</span>
-                    <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
-                  </label>
-                  {formState.logoUrl && (
-                    <span className="text-xs font-mono-data text-[#4E8B62] font-bold">Logo Uploaded ✓</span>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between pt-3 border-t-2 border-dotted border-[#303030]/40">
+              <div className="flex items-center justify-between pt-4 border-t-2 border-dotted border-[#303030]/40">
                 <RetroButton type="button" variant="neutral" size="sm" onClick={handleReset}>
                   <RefreshCw className="w-3.5 h-3.5" />
                   <span>Reset Default</span>
@@ -410,21 +253,21 @@ export const DocumentCustomization: React.FC = () => {
 
                 <RetroButton type="submit" variant="success" size="lg" disabled={saving}>
                   <Save className="w-4 h-4" />
-                  <span>{saving ? 'SAVING TO SUPABASE...' : 'SAVE CHANGES'}</span>
+                  <span>{saving ? 'SAVING...' : 'SAVE CHANGES'}</span>
                 </RetroButton>
               </div>
             </form>
           </div>
 
           {/* Right Column: Live Preview */}
-          <div className="lg:col-span-6 space-y-4">
+          <div className="lg:col-span-7 space-y-4">
             <div className="flex items-center justify-between bg-[#182747] text-[#FFF8E7] px-3 py-2 border-2 border-[#303030]">
               <span className="font-mono-data text-xs font-bold flex items-center gap-1.5 text-[#F4C542]">
                 <Eye className="w-4 h-4" />
                 <span>LIVE PREVIEW: {formState.title}</span>
               </span>
               <span className="text-[11px] font-mono-data bg-[#F4C542] text-[#182747] px-2 py-0.5 font-bold">
-                REAL-TIME
+                AUTO-GENERATED
               </span>
             </div>
 

@@ -81,6 +81,7 @@ create table if not exists public.task_submissions (
   file_name text,
   file_size text,
   file_type text,
+  project_url text,
   started_at timestamptz,
   submitted_at timestamptz,
   admin_feedback text,

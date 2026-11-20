@@ -91,6 +91,7 @@ interface TaskSubmissionRow {
   file_name: string | null;
   file_size: string | null;
   file_type: string | null;
+  project_url: string | null;
   started_at: string | null;
   submitted_at: string | null;
   admin_feedback: string | null;
@@ -313,6 +314,7 @@ function toTaskSubmissionRow(s: TaskSubmissionRecord): TaskSubmissionRow {
     file_name: s.fileName ?? null,
     file_size: s.fileSize ?? null,
     file_type: s.fileType ?? null,
+    project_url: s.projectUrl ?? null,
     started_at: s.startedAt ?? null,
     submitted_at: s.submittedAt ?? null,
     admin_feedback: s.adminFeedback ?? null,
@@ -330,6 +332,7 @@ function fromTaskSubmissionRow(r: TaskSubmissionRow): TaskSubmissionRecord {
     fileName: r.file_name ?? undefined,
     fileSize: r.file_size ?? undefined,
     fileType: r.file_type ?? undefined,
+    projectUrl: r.project_url ?? undefined,
     startedAt: r.started_at ?? undefined,
     submittedAt: r.submitted_at ?? undefined,
     adminFeedback: r.admin_feedback ?? undefined,
