@@ -59,7 +59,7 @@ export const AdminLayout: React.FC = () => {
               </div>
               <div className="min-w-0">
                 <div className="font-pixel text-[10px] sm:text-xs text-[#F4C542] truncate">
-                  ADMIN_CONTROL_ROOM.EXE
+                  ADMIN CONTROL ROOM
                 </div>
                 <p className="text-xs text-[#F4EBD0] mt-1 truncate">
                   Skillora Operations &amp; Certification Command Console
@@ -84,7 +84,7 @@ export const AdminLayout: React.FC = () => {
 
       <NotificationDialog
         open={confirmResetOpen}
-        title="CONFIRM_DEMO_RESET.EXE"
+        title="CONFIRM DEMO RESET"
         message="Are you sure you want to reset all portal records (students, tasks, submissions, certificates, and LORs) back to the initial Skillora demo dataset?"
         type="info"
         confirmLabel="Reset Demo Data"
@@ -95,7 +95,7 @@ export const AdminLayout: React.FC = () => {
 
       <NotificationDialog
         open={resetDoneOpen}
-        title="DEMO_RESET_COMPLETE.EXE"
+        title="DEMO RESET COMPLETE"
         message="All Skillora portal data has been restored to the initial demonstration snapshot."
         type="success"
         confirmLabel="OK"

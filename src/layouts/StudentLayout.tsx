@@ -57,7 +57,7 @@ export const StudentLayout: React.FC = () => {
               </div>
               <div className="min-w-0">
                 <div className="font-pixel text-[10px] sm:text-xs text-[#182747] truncate">
-                  SKILLORA_STUDENT_TERMINAL.EXE
+                  SKILLORA STUDENT TERMINAL
                 </div>
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#303030] mt-1">
                   <span className="font-bold text-[#182747]">
