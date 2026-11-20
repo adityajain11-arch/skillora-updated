@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Award, FileText, RefreshCw, Save, Upload, Eye, ScrollText, CheckCircle2 } from 'lucide-react';
+import { Award, FileText, RefreshCw, Save, Upload, Eye, ScrollText, CheckCircle2, FileCheck } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { DocumentTemplateConfig, InternshipDomain } from '../../types';
 import { RetroWindow } from '../../components/RetroWindow';
@@ -45,13 +45,13 @@ export const DocumentCustomization: React.FC = () => {
   const [toastType, setToastType] = useState<'success' | 'error'>('success');
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const found =
       state.documentTemplates.find((d) => d.id === activeTab) ||
       defaultTemplates.find((d) => d.id === activeTab);
     if (found) {
       setFormState({ ...found });
-      setUploadedFileName(null);
+      setUploadedFileName(found.logoUrl ? 'Customized_Document_Template' : null);
     }
   }, [activeTab, state.documentTemplates]);
 
@@ -62,12 +62,19 @@ export const DocumentCustomization: React.FC = () => {
   const handleDocumentFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > 15 * 1024 * 1024) {
+        setToastType('error');
+        setToastMessage('File size exceeds 15MB limit. Please upload a smaller PDF or image.');
+        return;
+      }
       setUploadedFileName(file.name);
       const reader = new FileReader();
       reader.onload = (uploadEvent) => {
+        const result = uploadEvent.target?.result as string;
         setFormState((prev) => ({
           ...prev,
-          logoUrl: uploadEvent.target?.result as string,
+          logoUrl: result,
+          updatedAt: new Date().toISOString(),
         }));
       };
       reader.readAsDataURL(file);
@@ -85,7 +92,7 @@ export const DocumentCustomization: React.FC = () => {
       const res = await saveDocumentTemplate(updated);
       if (res.ok) {
         setToastType('success');
-        setToastMessage(`Successfully saved ${formState.title} document template & uploaded asset to Supabase!`);
+        setToastMessage(`Successfully saved uploaded document template for ${formState.title} to Supabase!`);
       } else {
         setToastType('error');
         setToastMessage(`Failed to save to Supabase: ${res.error || 'Unknown error'}`);
@@ -108,7 +115,7 @@ export const DocumentCustomization: React.FC = () => {
     }
   };
 
-  // Dummy sample records for live preview
+  // Sample records for live preview
   const sampleStudent = state.students[0] || {
     id: 'SKL-2026-1001',
     fullName: 'Aarav Mehta',
@@ -166,14 +173,14 @@ export const DocumentCustomization: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <RetroWindow title="DOCUMENT_CUSTOMIZATION_HUB.EXE" headerColor="navy">
+      <RetroWindow title="DOCUMENT_CUSTOMIZATION_HUB" headerColor="navy">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b-2 border-dotted border-[#303030]/40">
           <div>
             <h1 className="font-pixel text-xs sm:text-sm text-[#182747]">
-              ADMIN DOCUMENT TEMPLATE &amp; PDF/IMAGE UPLOAD
+              ADMIN DOCUMENT TEMPLATE UPLOAD (PDF / IMAGE ONLY)
             </h1>
             <p className="text-sm text-[#303030] mt-1">
-              Upload or replace PDF documents and images for Offer Letters, Certificates, and LORs with auto-generation support.
+              Upload or replace official PDF documents or image design templates. Changes persist securely in Supabase.
             </p>
           </div>
 
@@ -207,22 +214,24 @@ export const DocumentCustomization: React.FC = () => {
 
         {/* Upload & Preview Workspace */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
-          {/* Left Column: Upload Space Only */}
+          {/* Left Column: PDF & Image Upload Space Only */}
           <div className="lg:col-span-5 space-y-4">
             <div className="bg-[#F4EBD0] border-2 border-[#303030] p-4">
               <span className="font-pixel text-[9px] text-[#4169E1] uppercase">
-                ACTIVE SECTION: {formState.title}
+                ACTIVE TEMPLATE: {formState.title}
               </span>
               <p className="text-xs text-[#303030] mt-1 leading-relaxed">
-                Upload your official PDF document or high-resolution design image template. This replaces the active template and persists securely in Supabase.
+                Upload your official PDF document or high-resolution design image template. This replaces the active template and persists in Supabase.
               </p>
             </div>
 
             <form onSubmit={handleSave} className="space-y-4 bg-white border-2 border-[#303030] p-5">
-              <div className="border-2 border-dashed border-[#303030] p-6 text-center bg-[#FFF8E7] hover:bg-[#F4EBD0]/40 transition-colors">
-                <Upload className="w-10 h-10 mx-auto text-[#182747] mb-2" />
+              <div className="border-2 border-dashed border-[#303030] p-8 text-center bg-[#FFF8E7] hover:bg-[#F4EBD0]/40 transition-colors">
+                <Upload className="w-12 h-12 mx-auto text-[#182747] mb-3" />
                 <label className="block text-xs font-bold uppercase text-[#182747] cursor-pointer">
-                  <span>Click to Upload PDF or Image</span>
+                  <span className="px-4 py-2 bg-[#182747] text-[#FFF8E7] border-2 border-[#303030] inline-block hover:bg-[#22355e] transition-colors">
+                    BROWSE PDF OR IMAGE
+                  </span>
                   <input
                     type="file"
                     accept=".pdf,image/*"
@@ -230,17 +239,17 @@ export const DocumentCustomization: React.FC = () => {
                     className="hidden"
                   />
                 </label>
-                <p className="text-[11px] text-gray-600 mt-1">Supports PDF, PNG, JPG (Max 15MB)</p>
+                <p className="text-[11px] text-gray-600 mt-3">Supports PDF, PNG, JPG (Max 15MB)</p>
                 {uploadedFileName && (
-                  <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 bg-[#4E8B62] text-white text-xs font-mono-data font-bold">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>{uploadedFileName}</span>
+                  <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 bg-[#4E8B62] text-white text-xs font-mono-data font-bold">
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Uploaded: {uploadedFileName}</span>
                   </div>
                 )}
                 {formState.logoUrl && !uploadedFileName && (
-                  <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 bg-[#4169E1] text-white text-xs font-mono-data font-bold">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>Document Template Loaded ✓</span>
+                  <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 bg-[#4169E1] text-white text-xs font-mono-data font-bold">
+                    <FileCheck className="w-4 h-4" />
+                    <span>Active Template Loaded from Supabase ✓</span>
                   </div>
                 )}
               </div>
@@ -253,7 +262,7 @@ export const DocumentCustomization: React.FC = () => {
 
                 <RetroButton type="submit" variant="success" size="lg" disabled={saving}>
                   <Save className="w-4 h-4" />
-                  <span>{saving ? 'SAVING...' : 'SAVE CHANGES'}</span>
+                  <span>{saving ? 'SAVING TO SUPABASE...' : 'SAVE CHANGES'}</span>
                 </RetroButton>
               </div>
             </form>
@@ -267,19 +276,34 @@ export const DocumentCustomization: React.FC = () => {
                 <span>LIVE PREVIEW: {formState.title}</span>
               </span>
               <span className="text-[11px] font-mono-data bg-[#F4C542] text-[#182747] px-2 py-0.5 font-bold">
-                AUTO-GENERATED
+                REAL-TIME
               </span>
             </div>
 
             <div className="border-2 border-[#303030] bg-[#f0f0f0] p-4 max-h-[750px] overflow-y-auto retro-bevel-in">
-              {activeTab === 'offer_letter' && (
-                <OfferLetterPreview student={sampleStudent} offerLetter={sampleOfferRecord} />
-              )}
-              {activeTab === 'certificate' && (
-                <CertificatePreview certificate={sampleCertRecord} />
-              )}
-              {activeTab === 'lor' && (
-                <LORPreview lor={sampleLorRecord} college={sampleStudent.college} />
+              {formState.logoUrl && formState.logoUrl.startsWith('data:image/') ? (
+                <div className="p-4 bg-white border-2 border-[#303030] text-center">
+                  <p className="text-xs font-bold text-[#182747] mb-2">Custom Uploaded Image Template Preview:</p>
+                  <img src={formState.logoUrl} alt="Uploaded Template" className="max-w-full h-auto mx-auto border border-gray-300 shadow-sm" />
+                </div>
+              ) : formState.logoUrl && formState.logoUrl.startsWith('data:application/pdf') ? (
+                <div className="p-6 bg-white border-2 border-[#303030] text-center space-y-3">
+                  <FileText className="w-16 h-16 mx-auto text-[#4169E1]" />
+                  <p className="text-sm font-bold text-[#182747]">Custom PDF Document Template Loaded</p>
+                  <p className="text-xs text-gray-600">The PDF is stored and ready for issuance &amp; downloading.</p>
+                </div>
+              ) : (
+                <>
+                  {activeTab === 'offer_letter' && (
+                    <OfferLetterPreview student={sampleStudent} offerLetter={sampleOfferRecord} />
+                  )}
+                  {activeTab === 'certificate' && (
+                    <CertificatePreview certificate={sampleCertRecord} />
+                  )}
+                  {activeTab === 'lor' && (
+                    <LORPreview lor={sampleLorRecord} college={sampleStudent.college} />
+                  )}
+                </>
               )}
             </div>
           </div>
