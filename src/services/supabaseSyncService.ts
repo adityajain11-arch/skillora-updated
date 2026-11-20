@@ -615,7 +615,7 @@ export async function saveDocumentTemplateToSupabase(
 ): Promise<{ ok: boolean; error?: string }> {
   const { error } = await supabase
     .from('document_templates')
-    .upsert(toDocumentTemplateRow(template));
+    .upsert(toDocumentTemplateRow(template), { onConflict: 'id' });
   if (error) return { ok: false, error: error.message };
   return { ok: true };
 }
